@@ -12,6 +12,7 @@ import {
   estimateReadingTime,
   formatScore,
 } from '../lib/clusterUi';
+import { getTeapotMarketData } from '../data/teapotMarketData';
 
 export interface Props {
   entry: CollectionEntry<'teapots'>;
@@ -137,6 +138,7 @@ const seoMeta = TEAPOT_SEO_META[slug];
 const seoTitle = seoMeta?.title ?? `${name} Review | TeapotsCool`;
 const seoDescription = seoMeta?.description ?? description;
 const seoBrand = seoMeta?.brand ?? name.split(' ')[0];
+const market = getTeapotMarketData(slug);
 
 const productReviewSchema: Record<string, unknown> = {
   '@context': 'https://schema.org',
@@ -151,6 +153,24 @@ const productReviewSchema: Record<string, unknown> = {
   category: style,
   material,
   url: pageUrl,
+  ...(market
+    ? {
+        aggregateRating: {
+          '@type': 'AggregateRating',
+          ratingValue: market.buyerRating,
+          reviewCount: market.buyerReviewCount,
+          bestRating: 5,
+          worstRating: 1,
+        },
+        offers: {
+          '@type': 'AggregateOffer',
+          priceCurrency: 'USD',
+          lowPrice: market.lowPrice,
+          highPrice: market.highPrice,
+          availability: 'https://schema.org/InStock',
+        },
+      }
+    : {}),
   additionalProperty: [
     { '@type': 'PropertyValue', name: 'Material', value: material },
     { '@type': 'PropertyValue', name: 'Capacity', value: capacityLabel },
@@ -253,10 +273,15 @@ const breadcrumbSchema: Record<string, unknown> = {
             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-mono font-semibold bg-matcha text-rice">
               {badge}
             </span>
-            <span class="font-mono text-xs text-muted border border-border-subtle px-2.5 py-1 rounded-full">
-              Tier: {priceTier}
+            <span class="font-mono text-xs font-semibold text-charcoal border border-border-strong bg-stone/60 px-2.5 py-1 rounded-full tabular-nums">
+              {market ? `${market.priceRange} (${priceTier})` : `Tier: ${priceTier}`}
             </span>
-            <span class="font-mono text-xs text-terracotta-text font-semibold uppercase tracking-wider">
+            {market && (
+              <span class="font-mono text-xs font-semibold text-terracotta-text border border-border-subtle px-2.5 py-1 rounded-full tabular-nums">
+                ★ {market.buyerRating}/5 ({market.buyerReviewCount.toLocaleString('en-US')}+ reviews)
+              </span>
+            )}
+            <span class="font-mono text-xs text-muted uppercase tracking-wider">
               {style}
             </span>
           </div>
@@ -313,6 +338,24 @@ const breadcrumbSchema: Record<string, unknown> = {
             <dt class="font-mono text-[11px] uppercase tracking-wider text-muted">Stovetop Safe</dt>
             <dd class="font-medium text-charcoal text-right">{stovetopSafe}</dd>
           </div>
+          {market && (
+            <>
+              <div class="py-2.5 flex items-baseline justify-between gap-4">
+                <dt class="font-mono text-[11px] uppercase tracking-wider text-muted">
+                  Typical Retail Price
+                </dt>
+                <dd class="font-mono font-semibold text-charcoal text-right tabular-nums">
+                  {market.priceRange}
+                </dd>
+              </div>
+              <div class="py-2.5 flex items-baseline justify-between gap-4">
+                <dt class="font-mono text-[11px] uppercase tracking-wider text-muted">
+                  Where Sold
+                </dt>
+                <dd class="font-medium text-charcoal text-right">{market.whereToBuy}</dd>
+              </div>
+            </>
+          )}
         </dl>
 
         <!-- Studio CTAs -->
@@ -380,6 +423,59 @@ const breadcrumbSchema: Record<string, unknown> = {
         </div>
       </div>
     </section>
+
+    <!-- Verified Online Buyer Ratings & Multi-Store Consensus -->
+    {market && (
+      <section
+        aria-labelledby="buyer-reviews-heading"
+        class="border border-border-subtle bg-rice rounded-md p-6 sm:p-8 space-y-5"
+      >
+        <div class="flex flex-wrap items-baseline justify-between gap-3 pb-4 border-b border-border-subtle">
+          <div>
+            <p class="eyebrow">Public Marketplace Sentiment · Real Owner Feedback</p>
+            <h2 id="buyer-reviews-heading" class="font-serif text-2xl font-semibold text-charcoal mt-1">
+              What Verified Online Buyers Say
+            </h2>
+          </div>
+          <div class="text-right">
+            <span class="font-serif text-2xl font-semibold text-terracotta-text tabular-nums">
+              ★ {market.buyerRating}/5
+            </span>
+            <p class="font-mono text-[11px] text-muted tabular-nums">
+              Across ~{market.buyerReviewCount.toLocaleString('en-US')}+ store &amp; specialty reviews
+            </p>
+          </div>
+        </div>
+
+        <p class="text-base text-charcoal leading-relaxed max-w-[72ch]">
+          {market.buyerConsensus}
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-3 border-t border-border-subtle text-sm">
+          <div class="p-4 rounded bg-stone/45 space-y-1">
+            <p class="font-mono text-[10px] uppercase tracking-wider text-matcha font-semibold">
+              Typical Price &amp; Sellers
+            </p>
+            <p class="font-mono text-sm font-semibold text-charcoal tabular-nums">
+              {market.priceRange}
+            </p>
+            <p class="text-xs text-muted">{market.whereToBuy}</p>
+          </div>
+          <div class="p-4 rounded bg-stone/45 space-y-1">
+            <p class="font-mono text-[10px] uppercase tracking-wider text-matcha font-semibold">
+              Most Praised by Owners
+            </p>
+            <p class="text-xs text-charcoal leading-relaxed">{market.buyerPraise}</p>
+          </div>
+          <div class="p-4 rounded bg-stone/45 space-y-1">
+            <p class="font-mono text-[10px] uppercase tracking-wider text-terracotta-text font-semibold">
+              Common Buyer Caveat
+            </p>
+            <p class="text-xs text-muted leading-relaxed">{market.buyerCaveat}</p>
+          </div>
+        </div>
+      </section>
+    )}
 
     <!-- Editorial MDX Review Body -->
     <section aria-label="Detailed teapot review" class="pt-2">

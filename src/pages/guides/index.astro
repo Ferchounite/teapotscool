@@ -8,10 +8,12 @@ import {
   getClusterHubHref,
   getGuideUrl,
   getTeapotUrl,
+  getTeapotLeafSlug,
   estimateReadingTime,
   formatIsoDate,
   formatScore,
 } from '../../lib/clusterUi';
+import { getTeapotMarketData } from '../../data/teapotMarketData';
 
 const allGuides = await getCollection('guides');
 const allTeapots = (await getCollection('teapots')).sort((a, b) => {
@@ -223,27 +225,37 @@ const breadcrumbSchema: Record<string, unknown> = {
       </div>
 
       <div class="hairline-grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 rounded-md overflow-hidden">
-        {allTeapots.map((teapot) => (
-          <article class="min-w-0 p-4 flex flex-col justify-between gap-3 hover:bg-stone/35 transition-colors">
-            <div class="space-y-1.5">
-              <p class="font-mono text-[10px] uppercase tracking-wider text-terracotta-text font-semibold">
-                {teapot.data.material}
-              </p>
-              <h3 class="font-serif text-base font-semibold text-charcoal leading-snug">
-                <a
-                  href={getTeapotUrl(teapot)}
-                  class="inline-flex items-center min-h-[44px] py-1 hover:text-matcha underline decoration-border-strong underline-offset-4 hover:decoration-matcha transition-colors"
-                >
-                  {teapot.data.name}
-                </a>
-              </h3>
-            </div>
-            <p class="pt-2 border-t border-border-subtle font-mono text-[11px] text-muted tabular-nums">
-              Pour {formatScore(teapot.data.pourScore)}/10 &middot; Heat{' '}
-              {formatScore(teapot.data.heatScore)}/10
-            </p>
-          </article>
-        ))}
+        {allTeapots.map((teapot) => {
+          const market = getTeapotMarketData(getTeapotLeafSlug(teapot));
+          return (
+            <article class="min-w-0 p-4 flex flex-col justify-between gap-3 hover:bg-stone/35 transition-colors">
+              <div class="space-y-1.5">
+                <p class="font-mono text-[10px] uppercase tracking-wider text-terracotta-text font-semibold">
+                  {teapot.data.material}
+                </p>
+                <h3 class="font-serif text-base font-semibold text-charcoal leading-snug">
+                  <a
+                    href={getTeapotUrl(teapot)}
+                    class="inline-flex items-center min-h-[44px] py-1 hover:text-matcha underline decoration-border-strong underline-offset-4 hover:decoration-matcha transition-colors"
+                  >
+                    {teapot.data.name}
+                  </a>
+                </h3>
+              </div>
+              <div class="pt-2 border-t border-border-subtle space-y-1 font-mono text-[11px] text-muted tabular-nums">
+                <p>
+                  Pour {formatScore(teapot.data.pourScore)}/10 &middot; Heat{' '}
+                  {formatScore(teapot.data.heatScore)}/10
+                </p>
+                {market && (
+                  <p class="text-charcoal font-semibold">
+                    {market.priceRange} &middot; ★ {market.buyerRating}/5
+                  </p>
+                )}
+              </div>
+            </article>
+          );
+        })}
       </div>
     </section>
   </div>

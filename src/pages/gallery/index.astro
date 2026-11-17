@@ -3,7 +3,8 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import DisclosureBanner from '../../components/DisclosureBanner.astro';
 import GalleryFilter from '../../components/GalleryFilter.astro';
-import { SITE_URL, getTeapotUrl, formatScore } from '../../lib/clusterUi';
+import { SITE_URL, getTeapotUrl, getTeapotLeafSlug, formatScore } from '../../lib/clusterUi';
+import { getTeapotMarketData } from '../../data/teapotMarketData';
 
 const teapots = (await getCollection('teapots')).sort((a, b) => {
   if (a.data.featured !== b.data.featured) return a.data.featured ? -1 : 1;
@@ -102,6 +103,7 @@ const breadcrumbSchema: Record<string, unknown> = {
       <div id="teapot-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {teapots.map((teapot, idx) => {
           const href = getTeapotUrl(teapot);
+          const market = getTeapotMarketData(getTeapotLeafSlug(teapot));
           const pourStr = formatScore(teapot.data.pourScore);
           const heatStr = formatScore(teapot.data.heatScore);
           const searchText = [
@@ -145,8 +147,10 @@ const breadcrumbSchema: Record<string, unknown> = {
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-matcha text-rice">
                       {teapot.data.badge}
                     </span>
-                    <span class="font-mono text-xs text-muted">
-                      {teapot.data.style} · {teapot.data.priceTier}
+                    <span class="font-mono text-xs text-muted tabular-nums">
+                      {market
+                        ? `${market.priceRange} · ★ ${market.buyerRating}/5`
+                        : `${teapot.data.style} · ${teapot.data.priceTier}`}
                     </span>
                   </div>
 

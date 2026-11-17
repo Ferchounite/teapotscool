@@ -62,6 +62,7 @@ const teapotsCollection = defineCollection({
       'Yixing Zisha Clay',
       'Glazed Porcelain',
       'Ceramic & Stoneware',
+      'Insulated Stainless Steel',
     ]),
     style: z.enum([
       'Japanese Kyusu',

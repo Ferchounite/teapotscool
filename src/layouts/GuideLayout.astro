@@ -18,6 +18,7 @@ import {
   estimateReadingTime,
   formatIsoDate,
 } from '../lib/clusterUi';
+import { getTeapotMarketData } from '../data/teapotMarketData';
 
 export interface Props {
   entry: CollectionEntry<'guides'>;
@@ -268,34 +269,55 @@ if (affiliateProducts && affiliateProducts.length > 0) {
     name: `${title} — Tested Teapots`,
     itemListOrder: 'https://schema.org/ItemListOrderAscending',
     numberOfItems: affiliateProducts.length,
-    itemListElement: affiliateProducts.map((product, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      item: {
-        '@type': 'Product',
-        name: product.name,
-        material: product.material,
-        url: product.teapotSlug
-          ? `${SITE_URL}/gallery/${product.teapotSlug}/`
-          : guideUrl,
-        review: {
-          '@type': 'Review',
-          author: {
-            '@type': 'Person',
-            name: author || EDITORIAL_AUTHOR.name,
+    itemListElement: affiliateProducts.map((product, index) => {
+      const mkt = getTeapotMarketData(product.teapotSlug);
+      return {
+        '@type': 'ListItem',
+        position: index + 1,
+        item: {
+          '@type': 'Product',
+          name: product.name,
+          material: product.material,
+          url: product.teapotSlug
+            ? `${SITE_URL}/gallery/${product.teapotSlug}/`
+            : guideUrl,
+          ...(mkt
+            ? {
+                aggregateRating: {
+                  '@type': 'AggregateRating',
+                  ratingValue: mkt.buyerRating,
+                  reviewCount: mkt.buyerReviewCount,
+                  bestRating: 5,
+                  worstRating: 1,
+                },
+                offers: {
+                  '@type': 'AggregateOffer',
+                  priceCurrency: 'USD',
+                  lowPrice: mkt.lowPrice,
+                  highPrice: mkt.highPrice,
+                  availability: 'https://schema.org/InStock',
+                },
+              }
+            : {}),
+          review: {
+            '@type': 'Review',
+            author: {
+              '@type': 'Person',
+              name: author || EDITORIAL_AUTHOR.name,
+            },
+            reviewRating: {
+              '@type': 'Rating',
+              ratingValue: Number(((product.pourScore + (product.heatScore ?? 8)) / 2).toFixed(1)),
+              bestRating: 10,
+              worstRating: 1,
+            },
+            reviewBody:
+              product.bestFor ??
+              `${product.badge} teapot evaluated for pour precision (${product.pourScore}/10) and heat retention.`,
           },
-          reviewRating: {
-            '@type': 'Rating',
-            ratingValue: Number(((product.pourScore + (product.heatScore ?? 8)) / 2).toFixed(1)),
-            bestRating: 10,
-            worstRating: 1,
-          },
-          reviewBody:
-            product.bestFor ??
-            `${product.badge} teapot evaluated for pour precision (${product.pourScore}/10) and heat retention.`,
         },
-      },
-    })),
+      };
+    }),
   });
 }
 
