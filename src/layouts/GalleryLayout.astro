@@ -77,15 +77,76 @@ try {
   relatedGuides = [];
 }
 
+const TEAPOT_SEO_META: Record<
+  string,
+  { title: string; description?: string; brand: string }
+> = {
+  'bredemeijer-duet-bella-ronde-insulated': {
+    title: 'Bredemeijer Duet Bella Ronde Review | TeapotsCool',
+    brand: 'Bredemeijer',
+  },
+  'hario-chacha-kyusu-maru-700': {
+    title: 'Hario ChaCha Kyusu Maru 700ml Review | TeapotsCool',
+    description:
+      'Hands-on test of the Hario ChaCha Kyusu Maru 700ml glass teapot, examining laminar spout cut-off, deep stainless mesh basket space, and thermal behavior.',
+    brand: 'Hario',
+  },
+  'iwachu-arare-cast-iron-tetsubin': {
+    title: 'Iwachu Arare Cast Iron Tetsubin Review | TeapotsCool',
+    brand: 'Iwachu',
+  },
+  'kamjove-magnetic-automatic-glass-gongfu': {
+    title: 'Kamjove Magnetic Gongfu Teapot Review | TeapotsCool',
+    brand: 'Kamjove',
+  },
+  'old-dutch-sagaform-cast-iron-hobnail': {
+    title: 'Old Dutch Cast Iron Hobnail Pot Review | TeapotsCool',
+    brand: 'Old Dutch International',
+  },
+  'sweese-porcelain-fluted-infuser-teapot': {
+    title: 'Sweese Fluted Porcelain Teapot Review | TeapotsCool',
+    description:
+      'Studio lab review of the Sweese 800ml fluted glazed porcelain teapot, testing laminar spout flow, stain resistance, and afternoon tea heat retention.',
+    brand: 'Sweese',
+  },
+  'teabloom-celebration-stovetop-glass': {
+    title: 'Teabloom Celebration Glass Pot Review | TeapotsCool',
+    description:
+      'Lab test of the Teabloom Celebration 1200ml stovetop borosilicate glass teapot covering spout flow control, blooming tea space, and thermal safety.',
+    brand: 'Teabloom',
+  },
+  'tokoname-gyokko-yokode-kyusu': {
+    title: 'Tokoname Gyokko Yokode Kyusu Review | TeapotsCool',
+    brand: 'Gyokko Kiln',
+  },
+  'yixing-zhuni-shui-ping-clay-teapot': {
+    title: 'Yixing Zhuni Shui Ping Teapot Review | TeapotsCool',
+    description:
+      'Studio review of the 160ml Yixing Zhuni Shui Ping clay teapot, testing water-level balance, multi-hole clay filtration, and high-heat oolong dynamics.',
+    brand: 'Yixing Zisha Artisan',
+  },
+  'zero-japan-universal-artisan-teapot': {
+    title: 'Zero Japan Universal Teapot Review | TeapotsCool',
+    description:
+      'Hands-on lab review of the Zero Japan Universal 450ml stoneware teapot, testing drip-free spout geometry, clip-on stainless lid, and ceramic heat balance.',
+    brand: 'Zero Japan',
+  },
+};
+
+const seoMeta = TEAPOT_SEO_META[slug];
+const seoTitle = seoMeta?.title ?? `${name} Review | TeapotsCool`;
+const seoDescription = seoMeta?.description ?? description;
+const seoBrand = seoMeta?.brand ?? name.split(' ')[0];
+
 const productReviewSchema: Record<string, unknown> = {
   '@context': 'https://schema.org',
   '@type': 'Product',
   name,
-  description,
+  description: seoDescription,
   image: [imageUrl],
   brand: {
     '@type': 'Brand',
-    name: name.split(' ')[0],
+    name: seoBrand,
   },
   category: style,
   material,
@@ -144,8 +205,8 @@ const breadcrumbSchema: Record<string, unknown> = {
 ---
 
 <BaseLayout
-  title={`${name} Review & Pour Test | TeapotsCool`}
-  description={description}
+  title={seoTitle}
+  description={seoDescription}
   canonicalPath={pagePath}
   ogImage={image}
   schemas={[productReviewSchema, breadcrumbSchema]}

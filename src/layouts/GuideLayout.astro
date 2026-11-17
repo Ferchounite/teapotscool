@@ -66,12 +66,82 @@ const imageUrl = featuredImage.startsWith('http')
 const calculatedReadingTime = estimateReadingTime(entry.body, readingTime);
 const wordCount = entry.body ? entry.body.trim().split(/\s+/).filter(Boolean).length : 0;
 
+const GUIDE_SEO_META: Record<string, { title: string; description?: string }> = {
+  'coolest-unique-teapots': {
+    title: '25 Coolest Unique Teapots That Pour Well | TeapotsCool',
+  },
+  'best-glass-flowering-teapots': {
+    title: 'Best Glass & Flowering Teapots (Tested) | TeapotsCool',
+    description:
+      'Hands-on test of the best borosilicate glass and flowering teapots—comparing stovetop safety, blooming dome height, and drip-free spout precision.',
+  },
+  'japanese-kyusu-teapots-guide': {
+    title: 'Authentic Japanese Kyusu Teapot Guide | TeapotsCool',
+    description:
+      'Master authentic Japanese kyusu teapots: yokode side-handle ergonomics, Tokoname clay mineral physics, and sasame ceramic mesh vs. steel strainers.',
+  },
+  'best-cast-iron-tetsubin-teapots': {
+    title: 'Best Cast Iron Teapots (Tetsubin) Guide | TeapotsCool',
+    description:
+      'Hands-on comparison of enamel-lined cast iron teapots vs. raw Japanese Nanbu Tekki tetsubin, tested for heat retention, pour balance, and rust care.',
+  },
+  'quirky-novelty-teapots-gifts': {
+    title: '15 Quirky & Whimsical Novelty Teapots | TeapotsCool',
+    description:
+      'Discover 15 quirky and whimsical novelty teapots—from magnetic Gongfu brewers to sculptural ceramic pots—bench-tested so they pour cleanly without drips.',
+  },
+  'complete-teapot-care-guide': {
+    title: 'How to Clean & Descale Any Teapot | TeapotsCool',
+    description:
+      'A material-by-material protocol to clean, descale, and preserve glass, porcelain, raw Zisha clay, Tokoname stoneware, and cast iron teapots safely.',
+  },
+  'how-to-season-cast-iron-teapot': {
+    title: 'How to Season a Cast Iron Teapot Safely | TeapotsCool',
+  },
+  'remove-tea-stains-glass-ceramic': {
+    title: 'How to Remove Tea Stains From Teapots | TeapotsCool',
+    description:
+      'Dissolve polymerized tea tannins from glass and ceramic teapots in 15 minutes using sodium percarbonate, baking soda, or citric acid—with zero bleach.',
+  },
+  'can-you-put-glass-teapot-on-stove': {
+    title: 'Can You Put a Glass Teapot on the Stove? | TeapotsCool',
+  },
+  'why-does-my-teapot-drip': {
+    title: 'Why Does My Teapot Drip? Physics & Fixes | TeapotsCool',
+    description:
+      'Understand the Coandă effect, spout lip radius, lid-vent airlock, and surface tension behind teapot dribbling—plus four practical fixes that work fast.',
+  },
+  'teapot-materials-comparison': {
+    title: 'Cast Iron vs Glass vs Clay vs Ceramic | TeapotsCool',
+    description:
+      'Compare thermal conductivity, heat retention, mineral porosity, and tea pairing across cast iron, borosilicate glass, Zisha clay, and glazed porcelain.',
+  },
+  'yixing-clay-vs-porcelain': {
+    title: 'Yixing Zisha Clay vs. Porcelain Teapots | TeapotsCool',
+    description:
+      'Discover the mineral physics of porous Yixing Zisha clay versus vitrified porcelain—and why one smooths tannins while the other sharpens high aroma.',
+  },
+  'enamel-lined-vs-unlined-cast-iron': {
+    title: 'Enamel Cast Iron vs. Raw Tetsubin Guide | TeapotsCool',
+    description:
+      'Learn the critical differences in lining chemistry, stovetop safety, iron mineral release, and rust care between enamel cast iron pots and raw tetsubin.',
+  },
+  'kyusu-vs-gaiwan': {
+    title: 'Kyusu vs. Gaiwan: Which Vessel Is Best? | TeapotsCool',
+    description:
+      'Side-handle Japanese kyusu vs. lidded Chinese porcelain gaiwan: compare extraction speed, leaf geometry, thermal grip, and ideal loose-leaf tea pairings.',
+  },
+};
+
+const seoTitle = GUIDE_SEO_META[leafSlug]?.title ?? `${title} | TeapotsCool`;
+const seoDescription = GUIDE_SEO_META[leafSlug]?.description ?? description;
+
 // 1. Article JSON-LD
 const articleSchema: Record<string, unknown> = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: title,
-  description,
+  description: seoDescription,
   image: [imageUrl],
   datePublished: pubDate.toISOString(),
   dateModified: updatedDate.toISOString(),
@@ -200,8 +270,8 @@ const topPick = affiliateProducts?.[0];
 ---
 
 <BaseLayout
-  title={`${title} | TeapotsCool`}
-  description={description}
+  title={seoTitle}
+  description={seoDescription}
   canonicalPath={guidePath}
   ogImage={featuredImage}
   ogType="article"

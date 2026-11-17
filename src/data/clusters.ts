@@ -24,7 +24,7 @@ export const CLUSTERS: Readonly<Record<ClusterSlug, ClusterMeta>> = {
     title: 'Curated Buying Guides & Unique Teapots',
     shortTitle: 'Buying Guides',
     description:
-      'Hands-on testing and side-by-side reviews of borosilicate glass, Japanese kyusu, cast iron tetsubin, and sculptural teapots engineered for clean, drip-free pours.',
+      'Hands-on testing and side-by-side reviews of borosilicate glass, Japanese kyusu, cast iron tetsubin, and sculptural teapots built for drip-free pours.',
     targetAudience: 'Gift buyers, design lovers, and tea vessel collectors',
     pillarSlug: 'coolest-unique-teapots',
     pillarTitle: '25 Coolest & Most Unique Teapots That Actually Pour Well',
@@ -46,7 +46,7 @@ export const CLUSTERS: Readonly<Record<ClusterSlug, ClusterMeta>> = {
     title: 'Care, Cleaning & Troubleshooting',
     shortTitle: 'Care & Maintenance',
     description:
-      'Step-by-step protocols for seasoning cast iron teapots, removing tannin stains from glass and porcelain, descaling mineral buildup, and diagnosing spout drips.',
+      'Step-by-step protocols for seasoning cast iron teapots, removing tannin stains from glass and porcelain, descaling minerals, and fixing spout drips.',
     targetAudience: 'Teapot owners seeking practical maintenance and troubleshooting solutions',
     pillarSlug: 'complete-teapot-care-guide',
     pillarTitle: 'How to Clean, Descale, and Maintain Every Type of Teapot',
