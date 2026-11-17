@@ -1,0 +1,46 @@
+/* TeapotsCool.com — Modern Japandi & Editorial Craft Design Tokens */
+:root {
+  /* Core Surfaces */
+  --bg-primary: #FAF8F5;
+  --bg-secondary: #F2EFE9;
+  --bg-surface-soft: #F6F3ED;
+
+  /* Hairline Borders */
+  --border-hairline: #E2DDD3;
+  --border-strong: #C9C1B3;
+
+  /* Ink & Copy Hierarchy */
+  --text-primary: #1F2421;
+  --text-muted: #4E5650;
+
+  /* Botanical & Clay Accents */
+  --accent-matcha: #2D5A27;
+  --accent-matcha-dark: #21441C;
+  --accent-matcha-soft: #EAF0E8;
+
+  /* Terracotta: #C86D51 for decorative strokes/indicators; #9E472D for WCAG AA text */
+  --accent-terracotta: #C86D51;
+  --accent-terracotta-text: #9E472D;
+  --accent-terracotta-soft: #F8ECE8;
+
+  /* Typography Stacks */
+  --font-serif: 'Fraunces', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Editorial Rhythm & Radii */
+  --measure-editorial: 68ch;
+  --radius-xs: 3px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-pill: 9999px;
+  --shadow-editorial: 0 8px 24px -12px rgba(31, 36, 33, 0.08);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 160ms;
+  --duration-base: 220ms;
+
+  /* Inline SVG Mask Tokens */
+  --icon-chevron-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 7.5 10 12.5 15 7.5'/%3E%3C/svg%3E");
+}

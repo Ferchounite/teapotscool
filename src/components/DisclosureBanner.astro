@@ -1,0 +1,33 @@
+---
+export interface Props {
+  compact?: boolean;
+  className?: string;
+}
+
+const { compact = false, className = '' } = Astro.props;
+---
+
+<aside
+  aria-label="Affiliate disclosure"
+  class:list={[
+    'border-y border-border-subtle bg-transparent text-xs text-muted flex flex-wrap items-center justify-between gap-x-6 gap-y-2',
+    compact ? 'py-2' : 'py-2.5',
+    className,
+  ]}
+>
+  <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 min-w-0">
+    <span class="font-mono text-[10px] font-semibold uppercase tracking-[0.09em] text-terracotta-text shrink-0">
+      FTC · Amazon Associates
+    </span>
+    <p class="leading-relaxed">
+      Reader-supported archive. Qualifying purchases via our links earn a commission at zero extra
+      cost to you; prices &amp; stock fluctuate live on retailer sites.
+    </p>
+  </div>
+  <a
+    href="/affiliate-disclosure/"
+    class="inline-flex items-center min-h-[44px] font-mono text-[11px] font-semibold uppercase tracking-wider text-matcha underline underline-offset-4 hover:text-terracotta-text shrink-0"
+  >
+    Full Disclosure &rarr;
+  </a>
+</aside>

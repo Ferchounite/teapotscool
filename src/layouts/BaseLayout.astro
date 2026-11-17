@@ -1,0 +1,326 @@
+---
+import '../styles/tokens.css';
+import '../styles/global.css';
+import JsonLd from '../components/JsonLd.astro';
+import DisclosureBanner from '../components/DisclosureBanner.astro';
+import { SITE_URL } from '../lib/clusterUi';
+
+export interface Props {
+  title: string;
+  description: string;
+  canonicalPath?: string;
+  ogImage?: string;
+  ogType?: 'website' | 'article';
+  publishedTime?: string;
+  modifiedTime?: string;
+  schemas?: Record<string, unknown>[];
+  showTopDisclosure?: boolean;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  canonicalPath,
+  ogImage = '/og-default.png',
+  ogType = 'website',
+  publishedTime,
+  modifiedTime,
+  schemas = [],
+  showTopDisclosure = false,
+  noindex = false,
+} = Astro.props;
+
+const resolvedPath = canonicalPath ?? Astro.url.pathname;
+const canonicalUrl = new URL(resolvedPath, SITE_URL).toString();
+const resolvedOgImage = ogImage.startsWith('http') ? ogImage : new URL(ogImage, SITE_URL).toString();
+
+const currentPath = Astro.url.pathname;
+const navLinks = [
+  { href: '/gallery/', label: 'Curated Gallery' },
+  { href: '/guides/buying-guides/', label: 'Buying Guides' },
+  { href: '/guides/care-maintenance/', label: 'Care & Repair' },
+  { href: '/guides/materials/', label: 'Materials' },
+  { href: '/tools/tea-steeping-timer/', label: 'Tea Timer' },
+  { href: '/about/', label: 'About' },
+];
+
+const isCurrent = (href: string) =>
+  href === '/' ? currentPath === '/' : currentPath.startsWith(href);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <meta name="theme-color" content="#FAF8F5" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Google Fonts: Fraunces, Plus Jakarta Sans & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    />
+
+    <!-- Open Graph -->
+    <meta property="og:site_name" content="TeapotsCool" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={resolvedOgImage} />
+    {publishedTime && <meta property="article:published_time" content={publishedTime} />}
+    {modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={resolvedOgImage} />
+
+    {schemas.length > 0 && <JsonLd schema={schemas} />}
+  </head>
+  <body>
+    <a href="#main-content" class="skip-link visually-hidden">Skip to main content</a>
+
+    {showTopDisclosure && (
+      <div class="border-b border-border-subtle bg-stone/40">
+        <div class="editorial-container">
+          <DisclosureBanner compact={true} className="border-y-0" />
+        </div>
+      </div>
+    )}
+
+    <header class="sticky top-0 z-40 border-t-2 border-t-matcha border-b border-border-subtle bg-rice/95 backdrop-blur-sm">
+      <div class="editorial-container flex items-center justify-between gap-4 py-3">
+        <a
+          href="/"
+          class="inline-flex items-center gap-3 min-h-[44px] py-0.5 text-charcoal hover:text-matcha transition-colors group"
+        >
+          <img
+            src="/images/brand/logo-mark.svg"
+            alt=""
+            width="40"
+            height="40"
+            class="w-10 h-10 shrink-0 bg-transparent transition-transform duration-200 group-hover:scale-105"
+          />
+          <span class="flex flex-col">
+            <span class="font-serif text-xl sm:text-2xl font-semibold tracking-tight leading-none">
+              TeapotsCool
+            </span>
+            <span class="font-mono text-[10px] uppercase tracking-[0.12em] text-muted mt-1">
+              Curated Vessels &amp; Tea Craft
+            </span>
+          </span>
+        </a>
+
+        <!-- Desktop Primary Navigation -->
+        <nav aria-label="Primary" class="hidden lg:block">
+          <ul class="flex items-center gap-1">
+            {
+              navLinks.map((link) => {
+                const active = isCurrent(link.href);
+                return (
+                  <li>
+                    <a
+                      href={link.href}
+                      aria-current={active ? 'page' : undefined}
+                      class:list={[
+                        'inline-flex items-center min-h-[44px] px-3 text-sm font-medium transition-colors border-b-2',
+                        active
+                          ? 'border-matcha text-matcha font-semibold'
+                          : 'border-transparent text-charcoal hover:text-matcha hover:border-border-strong',
+                      ]}
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                );
+              })
+            }
+          </ul>
+        </nav>
+
+        <!-- Mobile Native Disclosure Menu -->
+        <details class="mobile-nav lg:hidden relative">
+          <summary aria-label="Toggle navigation menu">
+            <svg
+              aria-hidden="true"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
+              <path d="M4 7h16M4 12h16M4 17h16" />
+            </svg>
+            <span>Menu</span>
+          </summary>
+          <nav
+            aria-label="Mobile navigation"
+            class="absolute right-0 top-[calc(100%+0.5rem)] w-64 border border-border-strong bg-rice rounded-md p-2 z-50"
+          >
+            <ul class="space-y-1">
+              {
+                navLinks.map((link) => {
+                  const active = isCurrent(link.href);
+                  return (
+                    <li>
+                      <a
+                        href={link.href}
+                        aria-current={active ? 'page' : undefined}
+                        class:list={[
+                          'flex items-center min-h-[44px] px-3 rounded text-sm font-medium transition-colors',
+                          active
+                            ? 'bg-matcha-soft text-matcha font-semibold'
+                            : 'text-charcoal hover:bg-stone',
+                        ]}
+                      >
+                        {link.label}
+                      </a>
+                    </li>
+                  );
+                })
+              }
+            </ul>
+          </nav>
+        </details>
+      </div>
+    </header>
+
+    <main id="main-content" tabindex="-1">
+      <slot />
+    </main>
+
+    <footer class="border-t border-border-strong bg-stone/55 mt-20">
+      <div class="editorial-container py-12 space-y-10">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-0 lg:divide-x lg:divide-border-subtle">
+          <!-- Brand & Mascot Signature -->
+          <div class="space-y-4 lg:pr-8">
+            <a href="/" class="inline-flex items-center gap-2.5 text-charcoal">
+              <img
+                src="/images/brand/logo-mark.svg"
+                alt=""
+                width="36"
+                height="36"
+                loading="lazy"
+                class="w-9 h-9 bg-transparent"
+              />
+              <span class="font-serif text-xl font-semibold tracking-tight">TeapotsCool</span>
+            </a>
+            <p class="text-sm text-muted leading-relaxed">
+              An independent editorial directory of thoughtfully engineered teapots—tested for
+              clean spout cut-off, heat retention, and tactile joy.
+            </p>
+            <div class="flex items-center gap-3 pt-2 border-t border-border-subtle">
+              <img
+                src="/images/brand/teapotscool-logo-mascot.png"
+                alt="Koko the Kyusu tea pet mascot"
+                width="52"
+                height="52"
+                loading="lazy"
+                decoding="async"
+                class="w-[52px] h-[52px] rounded-full border border-border-subtle object-cover bg-rice shrink-0"
+              />
+              <p class="text-xs text-muted italic leading-snug">
+                Curated with Clara Vance &amp; Koko, Chief Pour Inspector.
+              </p>
+            </div>
+          </div>
+
+          <!-- Topic Clusters -->
+          <div class="lg:px-8">
+            <p class="eyebrow mb-3">Topic Clusters</p>
+            <ul class="space-y-0.5 text-sm">
+              <li>
+                <a href="/guides/" class="inline-flex items-center min-h-[44px] text-charcoal hover:text-matcha">
+                  All Tea &amp; Teapot Guides
+                </a>
+              </li>
+              <li>
+                <a href="/guides/buying-guides/" class="inline-flex items-center min-h-[44px] text-charcoal hover:text-matcha">
+                  Curated &amp; Novelty Buying Guides
+                </a>
+              </li>
+              <li>
+                <a href="/guides/care-maintenance/" class="inline-flex items-center min-h-[44px] text-charcoal hover:text-matcha">
+                  Care, Cleaning &amp; Descaling
+                </a>
+              </li>
+              <li>
+                <a href="/guides/materials/" class="inline-flex items-center min-h-[44px] text-charcoal hover:text-matcha">
+                  Materials &amp; Brewing Science
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Directory & Tools -->
+          <div class="lg:px-8">
+            <p class="eyebrow mb-3">Explore &amp; Tools</p>
+            <ul class="space-y-0.5 text-sm">
+              <li>
+                <a href="/gallery/" class="inline-flex items-center min-h-[44px] text-charcoal hover:text-matcha">
+                  Curated Teapot Directory
+                </a>
+              </li>
+              <li>
+                <a href="/tools/tea-steeping-timer/" class="inline-flex items-center min-h-[44px] text-charcoal hover:text-matcha">
+                  Interactive Tea Steeping Timer
+                </a>
+              </li>
+              <li>
+                <a href="/about/" class="inline-flex items-center min-h-[44px] text-charcoal hover:text-matcha">
+                  Testing Methodology &amp; Clara Vance
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Transparency & Legal -->
+          <div class="lg:pl-8">
+            <p class="eyebrow mb-3">Transparency</p>
+            <ul class="space-y-0.5 text-sm">
+              <li>
+                <a href="/affiliate-disclosure/" class="inline-flex items-center min-h-[44px] text-charcoal hover:text-matcha">
+                  Affiliate Disclosure
+                </a>
+              </li>
+              <li>
+                <a href="/privacy-policy/" class="inline-flex items-center min-h-[44px] text-charcoal hover:text-matcha">
+                  Privacy Policy
+                </a>
+              </li>
+              <li>
+                <a href="/sitemap.xml" class="inline-flex items-center min-h-[44px] text-charcoal hover:text-matcha">
+                  XML Sitemap
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="pt-6 border-t border-border-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs text-muted leading-relaxed">
+          <p class="max-w-2xl">
+            <strong class="font-semibold text-charcoal">Amazon Associates Notice:</strong>
+            As an Amazon Associate (<code>tag=teapotscool-20</code>), TeapotsCool earns from
+            qualifying purchases. Product prices and availability are accurate as of the date/time
+            indicated on Amazon and are subject to change without notice.
+          </p>
+          <p class="font-mono shrink-0">
+            &copy; {new Date().getFullYear()} TeapotsCool.com
+          </p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

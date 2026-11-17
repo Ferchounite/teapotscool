@@ -1,0 +1,215 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BrewingTimerWidget from '../../components/BrewingTimerWidget.astro';
+import FaqAccordion, { type FaqItem } from '../../components/FaqAccordion.astro';
+import DisclosureBanner from '../../components/DisclosureBanner.astro';
+import { SITE_URL } from '../../lib/clusterUi';
+
+const pagePath = '/tools/tea-steeping-timer/';
+const pageUrl = new URL(pagePath, SITE_URL).toString();
+
+const timerFaqs: FaqItem[] = [
+  {
+    question: 'Why does teapot material change how long I should steep tea?',
+    answer:
+      'Vessel thermal mass and thermal conductivity control how fast water temperature drops after you pour from the kettle. Single-wall borosilicate glass radiates heat quickly, cooling water during a 2- to 3-minute infusion, whereas pre-warmed cast iron or thick double-walled pots hold extraction heat steadily near starting temperature.',
+  },
+  {
+    question: 'Should I pre-warm unlined Tokoname clay or Yixing clay teapots?',
+    answer:
+      'Yes. Porous unglazed clay absorbs initial thermal energy rapidly when cold. Swirling boiling or target-temperature water inside your empty kyusu or Yixing pot for 10 seconds before adding dry leaves prevents a sudden 6°C to 10°C temperature drop during the crucial first steep.',
+  },
+  {
+    question: 'Why do Japanese green teas taste bitter when steeped in boiling water?',
+    answer:
+      'High temperatures above 85°C (185°F) rapidly extract bitter catechins and excess caffeine before sweet L-theanine amino acids balance the cup. Steeping sencha near 80°C (176°F) and shaded gyokuro at 60°C (140°F) unlocks sweet umami broth without harsh astringency.',
+  },
+  {
+    question: 'Can I adjust steeping time mid-countdown for multiple infusions?',
+    answer:
+      'Yes. Use the +15s and -15s step controls anytime during a steep, or reset between gongfu flash infusions. For rolled oolongs and aged pu-erh, add roughly 10 to 15 seconds on each subsequent pour after the second infusion.',
+  },
+];
+
+const webAppSchema: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'TeapotsCool Interactive Tea Steeping Timer',
+  url: pageUrl,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Any (Web Browser)',
+  description:
+    'Vessel-aware interactive tea steeping timer with presets for Japanese Sencha, Gyokuro, Oolong, Silver Needle White, Assam Black, and Pu-erh teas plus gentle Web Audio chime.',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+  },
+};
+
+const faqSchema: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: timerFaqs.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.answer,
+    },
+  })),
+};
+
+const breadcrumbSchema: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
+    { '@type': 'ListItem', position: 2, name: 'Tea Steeping Timer', item: pageUrl },
+  ],
+};
+
+const referenceRows = [
+  {
+    tea: 'Gyokuro (Shaded Green)',
+    temp: '60°C / 140°F',
+    firstSteep: '90s (1m 30s)',
+    reSteeps: '3–4 infusions (+20s)',
+    bestVessel: 'Tokoname Kyusu or Porcelain Hohin (pre-warm gently)',
+  },
+  {
+    tea: 'Japanese Sencha',
+    temp: '80°C / 176°F',
+    firstSteep: '120s (2m 00s)',
+    reSteeps: '3 infusions (short 30s 2nd steep)',
+    bestVessel: 'Side-Handle Kyusu or Wide Borosilicate Glass',
+  },
+  {
+    tea: 'Silver Needle White',
+    temp: '85°C / 185°F',
+    firstSteep: '210s (3m 30s)',
+    reSteeps: '3–4 infusions (+30s)',
+    bestVessel: 'Clear Glass or Thin Porcelain (avoid unlined clay)',
+  },
+  {
+    tea: 'High-Mountain Oolong',
+    temp: '90°C / 194°F',
+    firstSteep: '180s (3m 00s Western) / 45s Gongfu',
+    reSteeps: '5–7 infusions (+15s)',
+    bestVessel: 'Magnetic Gongfu Glass, Porcelain, or Yixing Zhuni',
+  },
+  {
+    tea: 'Assam & Breakfast Black',
+    temp: '100°C / 212°F',
+    firstSteep: '240s (4m 00s)',
+    reSteeps: '2 infusions',
+    bestVessel: 'Double-Walled Stoneware or Enameled Cast Iron (pre-warmed)',
+  },
+  {
+    tea: 'Shou Pu-erh & Herbal',
+    temp: '100°C / 212°F',
+    firstSteep: '300s (5m 00s)',
+    reSteeps: '6–10 infusions (after 10s rinse)',
+    bestVessel: 'Dense Yixing Zisha Clay or Cast Iron Tetsubin',
+  },
+];
+---
+
+<BaseLayout
+  title="Interactive Tea Steeping Timer & Water Temperature Chart | TeapotsCool"
+  description="Time your loose-leaf infusions with vessel-aware thermal tips for glass, cast iron, unlined clay, and porcelain teapots—complete with soft harmonic chime and temperature chart."
+  canonicalPath={pagePath}
+  schemas={[webAppSchema, faqSchema, breadcrumbSchema]}
+>
+  <div class="editorial-container py-8 sm:py-12 space-y-12">
+    <nav aria-label="Breadcrumb" class="text-xs font-mono text-muted">
+      <ol class="flex flex-wrap items-center gap-1.5">
+        <li>
+          <a href="/" class="hover:text-matcha underline underline-offset-4 py-1 inline-block">
+            Home
+          </a>
+        </li>
+        <li aria-hidden="true">/</li>
+        <li aria-current="page" class="text-charcoal font-medium">Tea Steeping Timer</li>
+      </ol>
+    </nav>
+
+    <header class="space-y-4 max-w-3xl">
+      <p class="eyebrow">Brewing Utility · Vessel-Aware</p>
+      <h1 class="font-serif font-semibold text-charcoal">
+        Interactive Tea Steeping Timer
+      </h1>
+      <p class="text-base sm:text-lg text-muted leading-relaxed">
+        Dial in extraction down to the second. Select your tea cultivar and teapot material below
+        for tailored pre-warming guidance, fine 15-second adjustments, and an optional studio bell
+        chime.
+      </p>
+    </header>
+
+    <div class="max-w-3xl">
+      <BrewingTimerWidget compact={false} />
+    </div>
+
+    <!-- Reference Table -->
+    <section aria-labelledby="temp-chart-heading" class="space-y-5">
+      <div class="space-y-1.5 max-w-2xl">
+        <p class="eyebrow">Thermal Reference Guide</p>
+        <h2 id="temp-chart-heading" class="font-serif text-2xl sm:text-3xl font-semibold text-charcoal">
+          Water Temperature &amp; Vessel Pairing Chart
+        </h2>
+        <p class="text-sm sm:text-base text-muted">
+          Baseline Western-style and gongfu parameters tested across glass, clay, porcelain, and
+          enameled cast iron vessels.
+        </p>
+      </div>
+
+      <div class="border border-border-subtle rounded-md overflow-x-auto bg-rice">
+        <table class="w-full text-left border-collapse text-sm">
+          <caption class="visually-hidden">
+            Recommended water temperatures, steeping durations, and vessel pairings by tea type
+          </caption>
+          <thead class="bg-stone border-b border-border-subtle">
+            <tr>
+              <th scope="col" class="py-3.5 px-4 font-mono text-xs uppercase tracking-wider text-charcoal">
+                Tea Cultivar
+              </th>
+              <th scope="col" class="py-3.5 px-4 font-mono text-xs uppercase tracking-wider text-charcoal">
+                Target Temp
+              </th>
+              <th scope="col" class="py-3.5 px-4 font-mono text-xs uppercase tracking-wider text-charcoal">
+                First Steep
+              </th>
+              <th scope="col" class="py-3.5 px-4 font-mono text-xs uppercase tracking-wider text-charcoal">
+                Re-steeps
+              </th>
+              <th scope="col" class="py-3.5 px-4 font-mono text-xs uppercase tracking-wider text-charcoal">
+                Ideal Teapot Material
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border-subtle">
+            {referenceRows.map((row) => (
+              <tr class="hover:bg-stone/40 transition-colors">
+                <th scope="row" class="py-3.5 px-4 font-semibold text-charcoal whitespace-nowrap">
+                  {row.tea}
+                </th>
+                <td class="py-3.5 px-4 font-mono text-xs text-terracotta-text font-semibold tabular-nums whitespace-nowrap">
+                  {row.temp}
+                </td>
+                <td class="py-3.5 px-4 font-mono text-xs text-charcoal tabular-nums whitespace-nowrap">
+                  {row.firstSteep}
+                </td>
+                <td class="py-3.5 px-4 text-muted">{row.reSteeps}</td>
+                <td class="py-3.5 px-4 text-charcoal">{row.bestVessel}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <FaqAccordion faqs={timerFaqs} emitSchema={false} />
+
+    <DisclosureBanner />
+  </div>
+</BaseLayout>

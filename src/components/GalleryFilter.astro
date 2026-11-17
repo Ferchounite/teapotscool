@@ -1,0 +1,233 @@
+---
+export interface Props {
+  materials: string[];
+  styles: string[];
+  capacityTiers: string[];
+  priceTiers: string[];
+  totalCount: number;
+}
+
+const { materials, styles, capacityTiers, priceTiers, totalCount } = Astro.props;
+---
+
+<search aria-label="Filter curated teapots" class="border-y border-border-strong bg-stone/35 py-5 px-4 sm:px-6 space-y-4">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3.5 items-end">
+    <div class="sm:col-span-2 lg:col-span-2">
+      <label for="gallery-search" class="block font-mono text-[11px] uppercase tracking-wider font-semibold text-muted mb-1.5">
+        Search Vessels
+      </label>
+      <input
+        type="search"
+        id="gallery-search"
+        placeholder="e.g. Kyusu, glass, cast iron, blooming..."
+        class="w-full min-h-[44px] px-3 py-2 rounded border border-border-strong bg-rice text-sm text-charcoal placeholder:text-muted/80"
+      />
+    </div>
+
+    <div>
+      <label for="filter-material" class="block font-mono text-[11px] uppercase tracking-wider font-semibold text-muted mb-1.5">
+        Material
+      </label>
+      <select
+        id="filter-material"
+        class="w-full min-h-[44px] px-3 py-2 rounded border border-border-strong bg-rice text-sm text-charcoal"
+      >
+        <option value="all">All Materials</option>
+        {materials.map((m) => <option value={m}>{m}</option>)}
+      </select>
+    </div>
+
+    <div>
+      <label for="filter-style" class="block font-mono text-[11px] uppercase tracking-wider font-semibold text-muted mb-1.5">
+        Style
+      </label>
+      <select
+        id="filter-style"
+        class="w-full min-h-[44px] px-3 py-2 rounded border border-border-strong bg-rice text-sm text-charcoal"
+      >
+        <option value="all">All Styles</option>
+        {styles.map((s) => <option value={s}>{s}</option>)}
+      </select>
+    </div>
+
+    <div>
+      <label for="filter-capacity" class="block font-mono text-[11px] uppercase tracking-wider font-semibold text-muted mb-1.5">
+        Capacity
+      </label>
+      <select
+        id="filter-capacity"
+        class="w-full min-h-[44px] px-3 py-2 rounded border border-border-strong bg-rice text-sm text-charcoal"
+      >
+        <option value="all">Any Size</option>
+        {capacityTiers.map((c) => <option value={c}>{c}</option>)}
+      </select>
+    </div>
+
+    <div>
+      <label for="filter-price" class="block font-mono text-[11px] uppercase tracking-wider font-semibold text-muted mb-1.5">
+        Price Tier
+      </label>
+      <select
+        id="filter-price"
+        class="w-full min-h-[44px] px-3 py-2 rounded border border-border-strong bg-rice text-sm text-charcoal"
+      >
+        <option value="all">All Tiers</option>
+        {priceTiers.map((p) => <option value={p}>{p}</option>)}
+      </select>
+    </div>
+  </div>
+
+  <div class="pt-3 border-t border-border-subtle flex flex-wrap items-center justify-between gap-3">
+    <p class="text-sm text-charcoal font-medium" aria-live="polite" id="gallery-results-status">
+      Showing <span class="font-mono font-semibold tabular-nums">{totalCount}</span> of{' '}
+      <span class="font-mono font-semibold tabular-nums">{totalCount}</span> curated teapots
+    </p>
+
+    <div class="flex flex-wrap items-center gap-3">
+      <div class="flex items-center gap-2">
+        <label for="filter-sort" class="font-mono text-[11px] uppercase tracking-wider font-semibold text-muted">
+          Sort
+        </label>
+        <select
+          id="filter-sort"
+          class="min-h-[44px] px-3 py-2 rounded border border-border-strong bg-rice text-sm text-charcoal"
+        >
+          <option value="featured">Featured Curation</option>
+          <option value="pour">Highest Pour Precision</option>
+          <option value="heat">Highest Heat Retention</option>
+          <option value="name">Name (A–Z)</option>
+        </select>
+      </div>
+
+      <button
+        type="button"
+        id="filter-reset"
+        class="btn-hairline text-xs font-mono uppercase tracking-wider px-4"
+      >
+        Reset
+      </button>
+    </div>
+  </div>
+</search>
+
+<div
+  id="gallery-empty-state"
+  hidden
+  class="my-8 border border-border-subtle bg-stone/60 rounded-md p-8 text-center space-y-4"
+>
+  <p class="eyebrow">No Matching Vessels</p>
+  <h2 class="font-serif text-2xl font-semibold text-charcoal">
+    No teapots match your current filter combination
+  </h2>
+  <p class="text-sm text-muted max-w-md mx-auto">
+    Try widening your capacity tier, clearing the search term, or resetting all filters to browse the full studio directory.
+  </p>
+  <div>
+    <button type="button" id="empty-reset-btn" class="btn-matcha">
+      Reset all filters
+    </button>
+  </div>
+</div>
+
+<script>
+  function initGalleryFilters() {
+    const grid = document.getElementById('teapot-grid');
+    if (!grid || grid.dataset.filterBound === 'true') return;
+    grid.dataset.filterBound = 'true';
+
+    const searchInput = document.getElementById('gallery-search') as HTMLInputElement | null;
+    const materialSelect = document.getElementById('filter-material') as HTMLSelectElement | null;
+    const styleSelect = document.getElementById('filter-style') as HTMLSelectElement | null;
+    const capacitySelect = document.getElementById('filter-capacity') as HTMLSelectElement | null;
+    const priceSelect = document.getElementById('filter-price') as HTMLSelectElement | null;
+    const sortSelect = document.getElementById('filter-sort') as HTMLSelectElement | null;
+    const resetBtn = document.getElementById('filter-reset') as HTMLButtonElement | null;
+    const emptyResetBtn = document.getElementById('empty-reset-btn') as HTMLButtonElement | null;
+    const emptyState = document.getElementById('gallery-empty-state');
+    const statusEl = document.getElementById('gallery-results-status');
+
+    const cards = Array.from(grid.querySelectorAll<HTMLElement>('.teapot-card'));
+    const total = cards.length;
+    let searchDebounce: number | null = null;
+
+    const applyFilterAndSort = () => {
+      const q = (searchInput?.value ?? '').trim().toLowerCase();
+      const mat = materialSelect?.value ?? 'all';
+      const sty = styleSelect?.value ?? 'all';
+      const cap = capacitySelect?.value ?? 'all';
+      const pri = priceSelect?.value ?? 'all';
+      const sortMode = sortSelect?.value ?? 'featured';
+
+      const sorted = [...cards].sort((a, b) => {
+        if (sortMode === 'pour') {
+          return Number(b.dataset.pourScore || 0) - Number(a.dataset.pourScore || 0);
+        }
+        if (sortMode === 'heat') {
+          return Number(b.dataset.heatScore || 0) - Number(a.dataset.heatScore || 0);
+        }
+        if (sortMode === 'name') {
+          return (a.dataset.name || '').localeCompare(b.dataset.name || '');
+        }
+        const aFeat = a.dataset.featured === 'true' ? 1 : 0;
+        const bFeat = b.dataset.featured === 'true' ? 1 : 0;
+        if (aFeat !== bFeat) return bFeat - aFeat;
+        return Number(b.dataset.pourScore || 0) - Number(a.dataset.pourScore || 0);
+      });
+
+      let visibleCount = 0;
+      const frag = document.createDocumentFragment();
+      sorted.forEach((card) => {
+        const matchesMaterial = mat === 'all' || card.dataset.material === mat;
+        const matchesStyle = sty === 'all' || card.dataset.style === sty;
+        const matchesCapacity = cap === 'all' || card.dataset.capacityTier === cap;
+        const matchesPrice = pri === 'all' || card.dataset.priceTier === pri;
+        const matchesText =
+          q.length === 0 || (card.dataset.searchText || '').toLowerCase().includes(q);
+
+        const isVisible =
+          matchesMaterial && matchesStyle && matchesCapacity && matchesPrice && matchesText;
+        card.hidden = !isVisible;
+        card.classList.toggle('hidden', !isVisible);
+        if (isVisible) visibleCount += 1;
+        frag.appendChild(card);
+      });
+
+      grid.appendChild(frag);
+
+      if (emptyState) {
+        const hideEmpty = visibleCount > 0 || total === 0;
+        emptyState.hidden = hideEmpty;
+        emptyState.classList.toggle('hidden', hideEmpty);
+      }
+
+      if (statusEl) {
+        statusEl.textContent = `Showing ${visibleCount} of ${total} curated teapots`;
+      }
+    };
+
+    const resetAll = () => {
+      if (searchInput) searchInput.value = '';
+      if (materialSelect) materialSelect.value = 'all';
+      if (styleSelect) styleSelect.value = 'all';
+      if (capacitySelect) capacitySelect.value = 'all';
+      if (priceSelect) priceSelect.value = 'all';
+      if (sortSelect) sortSelect.value = 'featured';
+      applyFilterAndSort();
+    };
+
+    searchInput?.addEventListener('input', () => {
+      if (searchDebounce !== null) window.clearTimeout(searchDebounce);
+      searchDebounce = window.setTimeout(applyFilterAndSort, 180);
+    });
+
+    [materialSelect, styleSelect, capacitySelect, priceSelect, sortSelect].forEach((sel) => {
+      sel?.addEventListener('change', applyFilterAndSort);
+    });
+
+    resetBtn?.addEventListener('click', resetAll);
+    emptyResetBtn?.addEventListener('click', resetAll);
+  }
+
+  initGalleryFilters();
+  document.addEventListener('astro:page-load', initGalleryFilters);
+</script>

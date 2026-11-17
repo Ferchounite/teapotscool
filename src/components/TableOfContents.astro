@@ -1,0 +1,87 @@
+---
+export interface TocHeading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+export interface Props {
+  headings: TocHeading[];
+}
+
+const { headings } = Astro.props;
+const visibleHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+{
+  visibleHeadings.length > 0 && (
+    <nav aria-label="Table of contents" class="space-y-3" data-toc-nav>
+      <p class="eyebrow">On This Page</p>
+      <ul class="border-l border-border-subtle text-sm space-y-0.5">
+        {visibleHeadings.map((heading) => (
+          <li>
+            <a
+              href={`#${heading.slug}`}
+              data-toc-link={heading.slug}
+              class:list={[
+                'block py-1.5 border-l-2 -ml-[1px] border-transparent text-muted hover:text-charcoal hover:border-border-strong transition-colors leading-snug',
+                heading.depth === 3 ? 'pl-6 text-[13px]' : 'pl-3.5',
+              ]}
+            >
+              {heading.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+<script>
+  function initTocScrollSpy() {
+    const nav = document.querySelector<HTMLElement>('[data-toc-nav]');
+    if (!nav || nav.dataset.tocBound === 'true') return;
+    nav.dataset.tocBound = 'true';
+
+    const links = Array.from(nav.querySelectorAll<HTMLAnchorElement>('[data-toc-link]'));
+    if (links.length === 0) return;
+
+    const headingIds = links
+      .map((l) => l.dataset.tocLink)
+      .filter((id): id is string => Boolean(id));
+    const targets = headingIds
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
+
+    if (targets.length === 0 || !('IntersectionObserver' in window)) return;
+
+    const setActive = (activeId: string) => {
+      links.forEach((link) => {
+        const isCurrent = link.dataset.tocLink === activeId;
+        link.classList.toggle('border-matcha', isCurrent);
+        link.classList.toggle('text-matcha', isCurrent);
+        link.classList.toggle('font-semibold', isCurrent);
+        link.classList.toggle('border-transparent', !isCurrent);
+        link.classList.toggle('text-muted', !isCurrent);
+      });
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible.length > 0 && visible[0].target.id) {
+          setActive(visible[0].target.id);
+        }
+      },
+      { rootMargin: '-96px 0px -65% 0px', threshold: 0 }
+    );
+
+    targets.forEach((el) => observer.observe(el));
+    setActive(targets[0].id);
+  }
+
+  initTocScrollSpy();
+  document.addEventListener('astro:page-load', initTocScrollSpy);
+</script>

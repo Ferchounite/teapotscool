@@ -1,0 +1,131 @@
+---
+import JsonLd from './JsonLd.astro';
+
+export interface FaqItem {
+  question: string;
+  answer: string;
+}
+
+export interface Props {
+  faqs: FaqItem[];
+  emitSchema?: boolean;
+  heading?: string;
+  id?: string;
+}
+
+const {
+  faqs,
+  emitSchema = false,
+  heading = 'Frequently Asked Questions',
+  id,
+} = Astro.props;
+
+const accordionId = id ?? `faq-accordion-${Math.random().toString(36).slice(2, 8)}`;
+const headingId = `${accordionId}-heading`;
+
+const faqSchema =
+  emitSchema && faqs.length > 0
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faqs.map((item) => ({
+          '@type': 'Question',
+          name: item.question,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: item.answer,
+          },
+        })),
+      }
+    : null;
+---
+
+{
+  faqs.length > 0 && (
+    <>
+      {faqSchema && <JsonLd schema={faqSchema} />}
+      <section class="accordion" id={accordionId} aria-labelledby={headingId}>
+        <h2 id={headingId} class="font-serif text-2xl sm:text-3xl font-semibold text-charcoal">
+          {heading}
+        </h2>
+        <button
+          type="button"
+          {...({ commandfor: accordionId, command: '--toggle-all' } as Record<string, string>)}
+          aria-expanded="false"
+        >
+          <span class="expand">Expand all</span>
+          <span class="collapse">Collapse all</span>
+        </button>
+
+        {faqs.map((item) => (
+          <details>
+            <summary>{item.question}</summary>
+            <div class="accordion-panel">
+              <p class="leading-relaxed">{item.answer}</p>
+            </div>
+          </details>
+        ))}
+      </section>
+    </>
+  )
+}
+
+<script>
+  const win = window as unknown as { __tcAccordionListenersBound?: boolean };
+
+  if (!win.__tcAccordionListenersBound) {
+    win.__tcAccordionListenersBound = true;
+
+    const toggleAccordionItems = (accordion: Element, triggerBtn: Element) => {
+      const expand = triggerBtn.getAttribute('aria-expanded') !== 'true';
+      accordion.querySelectorAll(':scope > details').forEach((detailsEl) => {
+        (detailsEl as HTMLDetailsElement).open = expand;
+      });
+      triggerBtn.setAttribute('aria-expanded', String(expand));
+    };
+
+    // Native Invoker Command handler
+    document.addEventListener(
+      'command',
+      (event: Event) => {
+        const cmdEvent = event as Event & { command?: string; source?: Element | null };
+        if (cmdEvent.command !== '--toggle-all') return;
+        const target = cmdEvent.target as Element | null;
+        const source = cmdEvent.source;
+        if (!target || !source) return;
+        toggleAccordionItems(target, source);
+      },
+      { capture: true }
+    );
+
+    // Fallback click handler for browsers without HTMLButtonElement.prototype.commandForElement
+    if (!Object.hasOwn(HTMLButtonElement.prototype, 'commandForElement')) {
+      document.addEventListener('click', (event) => {
+        const target = event.target as Element | null;
+        const button = target?.closest<HTMLButtonElement>('[command="--toggle-all"]');
+        if (!button) return;
+        const targetId = button.getAttribute('commandfor');
+        const accordion = targetId ? document.getElementById(targetId) : button.closest('.accordion');
+        if (!accordion) return;
+        toggleAccordionItems(accordion, button);
+      });
+    }
+
+    // Keep Expand/Collapse All button aria-expanded synced when individual <details> toggle
+    document.addEventListener(
+      'toggle',
+      (event) => {
+        const detailsEl = event.target as Element | null;
+        if (!detailsEl || !detailsEl.matches('.accordion > details')) return;
+        const accordion = detailsEl.parentElement;
+        if (!accordion) return;
+        const button = accordion.querySelector(':scope > [command="--toggle-all"]');
+        if (!button) return;
+        const items = accordion.querySelectorAll<HTMLDetailsElement>(':scope > details');
+        const allOpen = Array.from(items).every((d) => d.open);
+        button.setAttribute('aria-expanded', String(allOpen));
+      },
+      { capture: true }
+    );
+  }
+</script>

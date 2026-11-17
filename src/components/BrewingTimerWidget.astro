@@ -1,0 +1,488 @@
+---
+export interface Props {
+  compact?: boolean;
+  initialTea?: string;
+  className?: string;
+}
+
+const { compact = false, initialTea = 'sencha', className = '' } = Astro.props;
+
+const widgetId = `tea-timer-${Math.random().toString(36).slice(2, 9)}`;
+const headingId = `${widgetId}-heading`;
+const progressId = `${widgetId}-progress`;
+
+const TEA_PRESETS = [
+  { id: 'sencha', name: 'Japanese Sencha', shortName: 'Sencha', tempC: 80, tempF: 176, seconds: 120 },
+  { id: 'gyokuro', name: 'Gyokuro', shortName: 'Gyokuro', tempC: 60, tempF: 140, seconds: 90 },
+  { id: 'oolong', name: 'High-Mountain Oolong', shortName: 'Oolong', tempC: 90, tempF: 194, seconds: 180 },
+  { id: 'white', name: 'Silver Needle White', shortName: 'White', tempC: 85, tempF: 185, seconds: 210 },
+  { id: 'assam', name: 'Assam Black', shortName: 'Black', tempC: 100, tempF: 212, seconds: 240 },
+  { id: 'puerh', name: 'Pu-erh / Herbal', shortName: 'Pu-erh', tempC: 100, tempF: 212, seconds: 300 },
+];
+
+const VESSELS = [
+  {
+    id: 'glass',
+    label: 'Glass',
+    note: 'Glass radiates heat quickly — pre-warm with hot water and keep the lid fitted while steeping.',
+  },
+  {
+    id: 'cast-iron',
+    label: 'Cast Iron',
+    note: 'High thermal mass — swirl once with hot water first; enamel-lined tetsubin locks temperature steadily.',
+  },
+  {
+    id: 'clay',
+    label: 'Unlined Clay',
+    note: 'Porous Tokoname or Zisha walls absorb heat initially — double-rinse interior before adding dry leaf.',
+  },
+  {
+    id: 'porcelain',
+    label: 'Porcelain',
+    note: 'Neutral thermal curve — ideal reference vessel for delicate aromatics without flavor carry-over.',
+  },
+];
+
+const activeTea = TEA_PRESETS.find((t) => t.id === initialTea) ?? TEA_PRESETS[0];
+const initialMinutes = String(Math.floor(activeTea.seconds / 60)).padStart(2, '0');
+const initialSecs = String(activeTea.seconds % 60).padStart(2, '0');
+---
+
+<section
+  class:list={[
+    'bg-stone/70 border-y border-border-subtle',
+    compact ? 'py-5 px-0 bg-transparent border-y-0 space-y-4' : 'border border-border-subtle rounded-md p-6 sm:p-7 space-y-6',
+    className,
+  ]}
+  aria-labelledby={headingId}
+  data-timer-widget={widgetId}
+  data-initial-seconds={activeTea.seconds}
+  data-initial-tea={activeTea.name}
+>
+  <header class="flex items-start justify-between gap-3 pb-4 border-b border-border-subtle">
+    <div class="flex items-center gap-3 min-w-0">
+      <img
+        src="/images/brand/mascot-koko-steeping.png"
+        alt="Koko the Kyusu tea pet keeping watch over steeping time"
+        width={compact ? 44 : 64}
+        height={compact ? 44 : 64}
+        loading="lazy"
+        decoding="async"
+        class:list={[
+          'rounded-full border border-border-subtle object-cover shrink-0 bg-rice',
+          compact ? 'w-11 h-11' : 'w-16 h-16',
+        ]}
+      />
+      <div class="min-w-0">
+        <p class="eyebrow">Steep &amp; Pour Timer</p>
+        <h2
+          id={headingId}
+          class:list={[
+            'font-serif font-semibold text-charcoal leading-tight',
+            compact ? 'text-lg' : 'text-xl sm:text-2xl',
+          ]}
+        >
+          {compact ? 'Tea Steeping Companion' : 'Precision Tea Steeping Timer'}
+        </h2>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      class="inline-flex items-center justify-center min-h-[44px] min-w-[44px] px-3 rounded border border-border-strong bg-rice text-xs font-mono font-semibold text-charcoal hover:border-charcoal transition-colors shrink-0"
+      data-timer-mute
+      aria-pressed="false"
+    >
+      <span data-mute-label>Chime: On</span>
+    </button>
+  </header>
+
+  <!-- Tea Presets (Shared Hairline Grid — zero nested boxes) -->
+  <div class="space-y-2">
+    <p class="font-mono text-[11px] uppercase tracking-wider font-semibold text-muted">
+      1. Select Tea Leaf
+    </p>
+    <div
+      class:list={[
+        'grid gap-px bg-border-subtle border border-border-subtle rounded overflow-hidden',
+        compact ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3',
+      ]}
+      role="group"
+      aria-label="Tea leaf presets"
+    >
+      {
+        TEA_PRESETS.map((tea) => {
+          const isSelected = tea.id === activeTea.id;
+          return (
+            <button
+              type="button"
+              class:list={[
+                'min-h-[44px] px-3 py-2.5 text-left transition-colors cursor-pointer',
+                'flex flex-col justify-center',
+                isSelected
+                  ? 'bg-matcha text-rice'
+                  : 'bg-rice text-charcoal hover:bg-stone/70',
+              ]}
+              data-tea-btn
+              data-tea-id={tea.id}
+              data-tea-name={tea.name}
+              data-tea-seconds={tea.seconds}
+              data-tea-temp-c={tea.tempC}
+              data-tea-temp-f={tea.tempF}
+              aria-pressed={isSelected ? 'true' : 'false'}
+            >
+              <span class="text-xs sm:text-sm font-semibold leading-tight">
+                {compact ? tea.shortName : tea.name}
+              </span>
+              <span
+                class:list={[
+                  'font-mono text-[11px] tabular-nums mt-0.5',
+                  isSelected ? 'text-rice/90' : 'text-muted',
+                ]}
+                data-tea-meta
+              >
+                {tea.tempC}°C · {Math.floor(tea.seconds / 60)}m{tea.seconds % 60 ? `${tea.seconds % 60}s` : ''}
+              </span>
+            </button>
+          );
+        })
+      }
+    </div>
+  </div>
+
+  <!-- Vessel Thermal Selector (Segmented Hairline Bar) -->
+  <div class="space-y-2">
+    <p class="font-mono text-[11px] uppercase tracking-wider font-semibold text-muted">
+      2. Teapot Vessel Material
+    </p>
+    <div
+      class="grid grid-cols-2 sm:grid-cols-4 gap-px bg-border-subtle border border-border-subtle rounded overflow-hidden"
+      role="group"
+      aria-label="Vessel thermal material"
+    >
+      {
+        VESSELS.map((vessel, index) => {
+          const isSelected = index === 0;
+          return (
+            <button
+              type="button"
+              class:list={[
+                'min-h-[44px] px-2.5 py-2 text-xs font-semibold transition-colors cursor-pointer',
+                isSelected
+                  ? 'bg-charcoal text-rice'
+                  : 'bg-rice text-charcoal hover:bg-stone/70',
+              ]}
+              data-vessel-btn
+              data-vessel-id={vessel.id}
+              data-vessel-note={vessel.note}
+              aria-pressed={isSelected ? 'true' : 'false'}
+            >
+              {vessel.label}
+            </button>
+          );
+        })
+      }
+    </div>
+    <p class="text-xs text-muted leading-relaxed pt-0.5" data-vessel-tip>
+      {VESSELS[0].note}
+    </p>
+  </div>
+
+  <!-- Live Countdown Readout & Progress -->
+  <div class="border-t border-border-subtle pt-4 space-y-3">
+    <div class="flex flex-wrap items-baseline justify-between gap-2">
+      <div>
+        <p class="font-mono text-xs text-muted" data-active-tea-label>{activeTea.name}</p>
+        <p
+          class:list={[
+            'font-mono font-semibold text-charcoal tabular-nums tracking-tight',
+            compact ? 'text-4xl' : 'text-5xl sm:text-6xl',
+          ]}
+          data-timer-display
+        >
+          {initialMinutes}:{initialSecs}
+        </p>
+      </div>
+      <div class="text-right">
+        <span class="inline-flex items-center px-2.5 py-1 rounded border border-border-subtle bg-rice font-mono text-xs font-semibold text-terracotta-text tabular-nums" data-temp-badge>
+          {activeTea.tempC}°C / {activeTea.tempF}°F
+        </span>
+      </div>
+    </div>
+
+    <div>
+      <label for={progressId} class="visually-hidden">Steeping countdown progress</label>
+      <progress
+        id={progressId}
+        class="timer-progress"
+        value="0"
+        max="100"
+        style="--timer-progress: 0%;"
+        data-timer-progress
+      ></progress>
+    </div>
+
+    <!-- Action Controls (>=44x44px) -->
+    <div class="flex flex-wrap items-center gap-2 pt-1">
+      <button
+        type="button"
+        class="btn-matcha flex-1 min-w-[120px]"
+        data-timer-toggle
+      >
+        Start Steep
+      </button>
+      <button
+        type="button"
+        class="btn-hairline px-3 font-mono text-xs tabular-nums"
+        data-timer-minus
+        aria-label="Subtract 15 seconds"
+      >
+        -15s
+      </button>
+      <button
+        type="button"
+        class="btn-hairline px-3 font-mono text-xs tabular-nums"
+        data-timer-plus
+        aria-label="Add 15 seconds"
+      >
+        +15s
+      </button>
+      <button
+        type="button"
+        class="btn-hairline px-3 text-xs"
+        data-timer-reset
+      >
+        Reset
+      </button>
+    </div>
+
+    <p
+      class="text-xs font-medium text-matcha min-h-[1.25rem]"
+      aria-live="polite"
+      data-timer-status
+    >
+      Ready to steep {activeTea.name}.
+    </p>
+  </div>
+</section>
+
+<script>
+  function playGentleChime() {
+    const win = window as Window & typeof globalThis & { webkitAudioContext?: typeof AudioContext };
+    const AudioCtx = win.AudioContext ?? win.webkitAudioContext;
+    if (!AudioCtx) return;
+    try {
+      const ctx = new AudioCtx();
+      const now = ctx.currentTime;
+      const playTone = (freq: number, startOffset: number, duration: number, peakGain: number) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + startOffset);
+        gain.gain.setValueAtTime(0.0001, now + startOffset);
+        gain.gain.exponentialRampToValueAtTime(peakGain, now + startOffset + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + startOffset + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + startOffset);
+        osc.stop(now + startOffset + duration + 0.05);
+      };
+      // Warm ceramic tea-bell fifth harmonic pair
+      playTone(528, 0, 1.4, 0.16);
+      playTone(792, 0.18, 1.3, 0.09);
+      setTimeout(() => {
+        ctx.close().catch(() => {});
+      }, 1900);
+    } catch {
+      // Ignore Web Audio errors on restricted devices
+    }
+  }
+
+  function formatTime(totalSeconds: number): string {
+    const safe = Math.max(0, Math.round(totalSeconds));
+    const mins = String(Math.floor(safe / 60)).padStart(2, '0');
+    const secs = String(safe % 60).padStart(2, '0');
+    return `${mins}:${secs}`;
+  }
+
+  function initTimerWidget(root: HTMLElement) {
+    if (root.dataset.timerBound === 'true') return;
+    root.dataset.timerBound = 'true';
+
+    let baseDuration = Number(root.dataset.initialSeconds || '120');
+    let remaining = baseDuration;
+    let activeTeaName = root.dataset.initialTea || 'Japanese Sencha';
+    let running = false;
+    let muted = false;
+    let intervalId: number | null = null;
+
+    const displayEl = root.querySelector<HTMLElement>('[data-timer-display]');
+    const teaLabelEl = root.querySelector<HTMLElement>('[data-active-tea-label]');
+    const tempBadgeEl = root.querySelector<HTMLElement>('[data-temp-badge]');
+    const progressEl = root.querySelector<HTMLProgressElement>('[data-timer-progress]');
+    const statusEl = root.querySelector<HTMLElement>('[data-timer-status]');
+    const toggleBtn = root.querySelector<HTMLButtonElement>('[data-timer-toggle]');
+    const minusBtn = root.querySelector<HTMLButtonElement>('[data-timer-minus]');
+    const plusBtn = root.querySelector<HTMLButtonElement>('[data-timer-plus]');
+    const resetBtn = root.querySelector<HTMLButtonElement>('[data-timer-reset]');
+    const muteBtn = root.querySelector<HTMLButtonElement>('[data-timer-mute]');
+    const muteLabelEl = root.querySelector<HTMLElement>('[data-mute-label]');
+    const vesselTipEl = root.querySelector<HTMLElement>('[data-vessel-tip]');
+    const teaButtons = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-tea-btn]'));
+    const vesselButtons = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-vessel-btn]'));
+
+    const updateVisuals = () => {
+      if (displayEl) displayEl.textContent = formatTime(remaining);
+      const elapsed = Math.max(0, baseDuration - remaining);
+      const pct = baseDuration > 0 ? Math.min(100, Math.max(0, (elapsed / baseDuration) * 100)) : 0;
+      if (progressEl) {
+        progressEl.value = Math.round(pct);
+        progressEl.style.setProperty('--timer-progress', `${pct.toFixed(1)}%`);
+        progressEl.style.setProperty(
+          '--timer-fill',
+          remaining === 0 ? 'var(--accent-terracotta-text)' : 'var(--accent-matcha)'
+        );
+      }
+      if (toggleBtn) {
+        toggleBtn.textContent = running ? 'Pause' : remaining === 0 ? 'Restart' : 'Start Steep';
+      }
+    };
+
+    const stopInterval = () => {
+      if (intervalId !== null) {
+        window.clearInterval(intervalId);
+        intervalId = null;
+      }
+      running = false;
+    };
+
+    const setStatus = (msg: string) => {
+      if (statusEl) statusEl.textContent = msg;
+    };
+
+    const startTimer = () => {
+      if (remaining <= 0) {
+        remaining = baseDuration;
+      }
+      if (running) return;
+      running = true;
+      updateVisuals();
+      setStatus(`Steeping ${activeTeaName}...`);
+      intervalId = window.setInterval(() => {
+        if (remaining > 0) {
+          remaining -= 1;
+          updateVisuals();
+        }
+        if (remaining <= 0) {
+          stopInterval();
+          updateVisuals();
+          setStatus(`${activeTeaName} is ready — pour your tea now.`);
+          if (!muted) {
+            playGentleChime();
+          }
+        }
+      }, 1000);
+    };
+
+    const pauseTimer = () => {
+      stopInterval();
+      updateVisuals();
+      setStatus(`Paused at ${formatTime(remaining)}.`);
+    };
+
+    toggleBtn?.addEventListener('click', () => {
+      if (running) {
+        pauseTimer();
+      } else {
+        startTimer();
+      }
+    });
+
+    minusBtn?.addEventListener('click', () => {
+      remaining = Math.max(5, remaining - 15);
+      if (remaining > baseDuration) baseDuration = remaining;
+      updateVisuals();
+      setStatus(`Adjusted remaining time to ${formatTime(remaining)}.`);
+    });
+
+    plusBtn?.addEventListener('click', () => {
+      remaining += 15;
+      if (remaining > baseDuration) baseDuration = remaining;
+      updateVisuals();
+      setStatus(`Adjusted remaining time to ${formatTime(remaining)}.`);
+    });
+
+    resetBtn?.addEventListener('click', () => {
+      stopInterval();
+      remaining = baseDuration;
+      updateVisuals();
+      setStatus(`Reset ${activeTeaName} to ${formatTime(baseDuration)}.`);
+    });
+
+    muteBtn?.addEventListener('click', () => {
+      muted = !muted;
+      muteBtn.setAttribute('aria-pressed', muted ? 'true' : 'false');
+      if (muteLabelEl) {
+        muteLabelEl.textContent = muted ? 'Chime: Muted' : 'Chime: On';
+      }
+      setStatus(muted ? 'Completion audio chime muted.' : 'Completion audio chime enabled.');
+    });
+
+    teaButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        stopInterval();
+        baseDuration = Number(btn.dataset.teaSeconds || '120');
+        remaining = baseDuration;
+        activeTeaName = btn.dataset.teaName || 'Tea';
+        const tempC = btn.dataset.teaTempC || '80';
+        const tempF = btn.dataset.teaTempF || '176';
+
+        teaButtons.forEach((other) => {
+          const isCurrent = other === btn;
+          other.setAttribute('aria-pressed', isCurrent ? 'true' : 'false');
+          other.classList.toggle('bg-matcha', isCurrent);
+          other.classList.toggle('text-rice', isCurrent);
+          other.classList.toggle('bg-rice', !isCurrent);
+          other.classList.toggle('text-charcoal', !isCurrent);
+          other.classList.toggle('hover:bg-stone/70', !isCurrent);
+          const meta = other.querySelector<HTMLElement>('[data-tea-meta]');
+          if (meta) {
+            meta.classList.toggle('text-rice/90', isCurrent);
+            meta.classList.toggle('text-muted', !isCurrent);
+          }
+        });
+
+        if (teaLabelEl) teaLabelEl.textContent = activeTeaName;
+        if (tempBadgeEl) tempBadgeEl.textContent = `${tempC}°C / ${tempF}°F`;
+        updateVisuals();
+        setStatus(`Selected ${activeTeaName} (${formatTime(baseDuration)} at ${tempC}°C).`);
+      });
+    });
+
+    vesselButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        vesselButtons.forEach((other) => {
+          const isCurrent = other === btn;
+          other.setAttribute('aria-pressed', isCurrent ? 'true' : 'false');
+          other.classList.toggle('bg-charcoal', isCurrent);
+          other.classList.toggle('text-rice', isCurrent);
+          other.classList.toggle('bg-rice', !isCurrent);
+          other.classList.toggle('text-charcoal', !isCurrent);
+          other.classList.toggle('hover:bg-stone/70', !isCurrent);
+        });
+        if (vesselTipEl && btn.dataset.vesselNote) {
+          vesselTipEl.textContent = btn.dataset.vesselNote;
+        }
+      });
+    });
+
+    updateVisuals();
+  }
+
+  const initAllTimers = () => {
+    document.querySelectorAll<HTMLElement>('[data-timer-widget]').forEach(initTimerWidget);
+  };
+
+  initAllTimers();
+  document.addEventListener('astro:page-load', initAllTimers);
+</script>

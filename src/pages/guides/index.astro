@@ -1,0 +1,190 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import DisclosureBanner from '../../components/DisclosureBanner.astro';
+import {
+  SITE_URL,
+  CLUSTER_LIST,
+  getClusterHubHref,
+  getGuideUrl,
+  estimateReadingTime,
+  formatIsoDate,
+} from '../../lib/clusterUi';
+
+const allGuides = await getCollection('guides');
+
+const collectionSchema: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Tea Brewing, Care & Teapot Buying Guides',
+  description:
+    'Comprehensive pillar guides and hands-on tutorials covering unique teapot reviews, cast iron seasoning, stain removal, and material heat physics.',
+  url: `${SITE_URL}/guides/`,
+};
+
+const breadcrumbSchema: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
+    { '@type': 'ListItem', position: 2, name: 'Guides Hub', item: `${SITE_URL}/guides/` },
+  ],
+};
+---
+
+<BaseLayout
+  title="Tea Brewing, Care & Teapot Guides Hub | TeapotsCool"
+  description="Browse all TeapotsCool pillar guides and deep-dive articles organized across Buying Guides, Care & Maintenance, and Material Science."
+  canonicalPath="/guides/"
+  schemas={[collectionSchema, breadcrumbSchema]}
+>
+  <div class="editorial-container py-8 sm:py-12 space-y-12">
+    <header class="space-y-4 max-w-3xl pb-6 border-b border-border-subtle">
+      <p class="eyebrow">Editorial Knowledge Silos</p>
+      <h1 class="font-serif font-semibold text-charcoal">
+        Teapot Buying, Care &amp; Brewing Guides
+      </h1>
+      <p class="text-base sm:text-lg text-muted leading-relaxed">
+        Structured into three research clusters—start with a flagship Pillar Guide for the big
+        picture, or dive straight into a targeted troubleshooting or material comparison.
+      </p>
+      <div class="flex flex-wrap gap-2.5 pt-2">
+        {CLUSTER_LIST.map((cluster) => (
+          <a href={`#cluster-${cluster.slug}`} class="btn-hairline text-sm">
+            {cluster.shortTitle}
+          </a>
+        ))}
+      </div>
+    </header>
+
+    <DisclosureBanner />
+
+    {CLUSTER_LIST.map((cluster, idx) => {
+      const clusterGuides = allGuides
+        .filter((g) => g.data.cluster === cluster.slug)
+        .sort((a, b) => {
+          if (a.data.isPillar !== b.data.isPillar) return a.data.isPillar ? -1 : 1;
+          return b.data.updatedDate.getTime() - a.data.updatedDate.getTime();
+        });
+      const pillar = clusterGuides.find((g) => g.data.isPillar);
+      const spokes = clusterGuides.filter((g) => !g.data.isPillar);
+      const hubHref = getClusterHubHref(cluster.slug);
+
+      return (
+        <section
+          id={`cluster-${cluster.slug}`}
+          aria-labelledby={`heading-${cluster.slug}`}
+          class="space-y-6 pb-12 border-b border-border-strong last:border-b-0"
+        >
+          <div class="flex flex-wrap items-end justify-between gap-4">
+            <div class="space-y-1.5 max-w-2xl">
+              <div class="flex items-baseline gap-3">
+                <span class="font-serif italic text-2xl text-terracotta-text font-medium tabular-nums">
+                  {String(idx + 1).padStart(2, '0')}
+                </span>
+                <p class="eyebrow">{cluster.accentLabel}</p>
+              </div>
+              <h2 id={`heading-${cluster.slug}`} class="font-serif text-2xl sm:text-3xl font-semibold text-charcoal">
+                {cluster.title}
+              </h2>
+              <p class="text-sm sm:text-base text-muted leading-relaxed">{cluster.description}</p>
+            </div>
+            <a
+              href={hubHref}
+              class="inline-flex items-center min-h-[44px] text-sm font-semibold text-matcha underline underline-offset-4 hover:text-terracotta-text"
+            >
+              View {cluster.shortTitle} hub &rarr;
+            </a>
+          </div>
+
+          {pillar && (
+            <article class="border border-border-strong border-l-4 border-l-matcha bg-stone/50 rounded-md overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+              <a href={getGuideUrl(pillar)} class="lg:col-span-5 block border-b lg:border-b-0 lg:border-r border-border-subtle">
+                <img
+                  src={pillar.data.featuredImage}
+                  alt={pillar.data.featuredImageAlt}
+                  width="800"
+                  height="450"
+                  loading="lazy"
+                  decoding="async"
+                  class="w-full h-full aspect-[16/9] object-cover"
+                />
+              </a>
+              <div class="lg:col-span-7 p-6 sm:p-7 flex flex-col justify-between gap-4">
+                <div class="space-y-2.5">
+                  <div class="flex flex-wrap items-center gap-2.5 text-xs font-mono">
+                    <span class="px-2.5 py-0.5 rounded-full bg-matcha text-rice font-semibold uppercase tracking-wider">
+                      Pillar Guide
+                    </span>
+                    <span class="text-muted">
+                      Updated {formatIsoDate(pillar.data.updatedDate)} ·{' '}
+                      {estimateReadingTime(pillar.body, pillar.data.readingTime)}
+                    </span>
+                  </div>
+                  <h3 class="font-serif text-2xl font-semibold text-charcoal leading-snug">
+                    <a href={getGuideUrl(pillar)} class="hover:text-matcha transition-colors">
+                      {pillar.data.title}
+                    </a>
+                  </h3>
+                  <p class="text-sm sm:text-base text-muted leading-relaxed">
+                    {pillar.data.description}
+                  </p>
+                </div>
+                <div>
+                  <a href={getGuideUrl(pillar)} class="btn-matcha">
+                    Read Pillar Guide
+                  </a>
+                </div>
+              </div>
+            </article>
+          )}
+
+          {spokes.length > 0 && (
+            <div class:list={[
+              'hairline-grid rounded-md overflow-hidden',
+              spokes.length === 2 || spokes.length === 4 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
+            ]}>
+              {spokes.map((spoke) => (
+                <article class="flex flex-col hover:bg-stone/35 transition-colors">
+                  <a href={getGuideUrl(spoke)} class="block border-b border-border-subtle">
+                    <img
+                      src={spoke.data.featuredImage}
+                      alt={spoke.data.featuredImageAlt}
+                      width="640"
+                      height="360"
+                      loading="lazy"
+                      decoding="async"
+                      class="w-full aspect-[16/9] object-cover"
+                    />
+                  </a>
+                  <div class="p-6 flex-1 flex flex-col justify-between gap-4">
+                    <div class="space-y-2">
+                      <p class="font-mono text-xs text-muted">
+                        <span class="text-terracotta-text font-semibold uppercase tracking-wider">
+                          {cluster.shortTitle}
+                        </span>{' '}
+                        · {estimateReadingTime(spoke.body, spoke.data.readingTime)}
+                      </p>
+                      <h3 class="font-serif text-lg sm:text-xl font-semibold text-charcoal leading-snug">
+                        <a href={getGuideUrl(spoke)} class="hover:text-matcha transition-colors">
+                          {spoke.data.title}
+                        </a>
+                      </h3>
+                      <p class="text-sm text-muted line-clamp-2">{spoke.data.description}</p>
+                    </div>
+                    <a
+                      href={getGuideUrl(spoke)}
+                      class="inline-flex items-center min-h-[44px] text-sm font-semibold text-matcha underline underline-offset-4 hover:text-terracotta-text"
+                    >
+                      Read guide &rarr;
+                    </a>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+      );
+    })}
+  </div>
+</BaseLayout>

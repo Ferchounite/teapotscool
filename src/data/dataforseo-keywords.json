@@ -1,0 +1,153 @@
+{
+  "source": "DataForSEO",
+  "market": "United States",
+  "language_code": "en",
+  "location_code": 2840,
+  "currency": "USD",
+  "keywords": [
+    {
+      "keyword": "tea timer",
+      "search_volume": 22200,
+      "cpc": 1.04,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "glass teapot",
+      "search_volume": 9900,
+      "cpc": 0.74,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "ceramic teapot",
+      "search_volume": 9900,
+      "cpc": 0.78,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "yixing clay teapot",
+      "search_volume": 8100,
+      "cpc": 1.09,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "clay teapot",
+      "search_volume": 8100,
+      "cpc": 1.09,
+      "keyword_difficulty": 7
+    },
+    {
+      "keyword": "japanese teapot",
+      "search_volume": 4400,
+      "cpc": 1.62,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "borosilicate glass teapot",
+      "search_volume": 3600,
+      "cpc": 1.04,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "cast iron teapot",
+      "search_volume": 3600,
+      "cpc": 0.64,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "teapot with infuser",
+      "search_volume": 3600,
+      "cpc": 0.71,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "loose leaf teapot",
+      "search_volume": 2900,
+      "cpc": 1.03,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "porcelain teapot",
+      "search_volume": 2400,
+      "cpc": 0.99,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "kyusu teapot",
+      "search_volume": 1900,
+      "cpc": 3.73,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "unique teapots",
+      "search_volume": 1000,
+      "cpc": 0.52,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "tea steeping timer",
+      "search_volume": 880,
+      "cpc": 0.41,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "flowering teapot",
+      "search_volume": 590,
+      "cpc": 0.45,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "cool teapots",
+      "search_volume": 480,
+      "cpc": 0.79,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "how to clean a teapot",
+      "search_volume": 480,
+      "cpc": 0.05,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "how to remove tea stains",
+      "search_volume": 480,
+      "cpc": 1.31,
+      "keyword_difficulty": 1
+    },
+    {
+      "keyword": "tetsubin teapot",
+      "search_volume": 390,
+      "cpc": 0.51,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "novelty teapots",
+      "search_volume": 210,
+      "cpc": 0.4,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "descale teapot",
+      "search_volume": 210,
+      "cpc": 0.25,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "can you put glass teapot on stove",
+      "search_volume": 140,
+      "cpc": null,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "how to clean cast iron teapot",
+      "search_volume": 110,
+      "cpc": null,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "gaiwan vs teapot",
+      "search_volume": 90,
+      "cpc": 0.92,
+      "keyword_difficulty": 0
+    }
+  ]
+}

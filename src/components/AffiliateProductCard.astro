@@ -1,0 +1,404 @@
+---
+import { getCollection } from 'astro:content';
+import { getTeapotLeafSlug, formatScore } from '../lib/clusterUi';
+
+export interface Props {
+  name: string;
+  asin: string;
+  affiliateUrl: string;
+  badge: string;
+  material: string;
+  capacity: string;
+  pourScore: number;
+  heatScore?: number;
+  priceTier?: '$' | '$$' | '$$$';
+  bestFor?: string;
+  pros?: string[];
+  cons?: string[];
+  teapotSlug?: string;
+  variant?: 'full' | 'quick-verdict' | 'compact';
+  image?: string;
+  imageAlt?: string;
+  secondaryStoreName?: string;
+  secondaryAffiliateUrl?: string;
+}
+
+const {
+  name,
+  asin,
+  affiliateUrl,
+  badge,
+  material,
+  capacity,
+  pourScore,
+  heatScore = 8,
+  priceTier,
+  bestFor,
+  pros = [],
+  cons = [],
+  teapotSlug,
+  variant = 'full',
+  image: explicitImage,
+  imageAlt: explicitImageAlt,
+  secondaryStoreName: explicitSecondaryName,
+  secondaryAffiliateUrl: explicitSecondaryUrl,
+} = Astro.props;
+
+let resolvedAsin = asin;
+let resolvedAffiliateUrl = affiliateUrl;
+let resolvedMaterial = material;
+let resolvedCapacity = capacity;
+let resolvedPourScore = pourScore;
+let resolvedHeatScore = heatScore;
+let resolvedPriceTier = priceTier;
+let resolvedImage = explicitImage;
+let resolvedImageAlt = explicitImageAlt ?? `${name} curated teapot preview`;
+let resolvedSecondaryName = explicitSecondaryName;
+let resolvedSecondaryUrl = explicitSecondaryUrl;
+
+if (teapotSlug) {
+  try {
+    const teapots = await getCollection('teapots');
+    const matched = teapots.find((t) => getTeapotLeafSlug(t) === teapotSlug);
+    if (matched) {
+      resolvedAsin = matched.data.asin;
+      resolvedAffiliateUrl = matched.data.affiliateUrl;
+      resolvedMaterial = matched.data.material;
+      resolvedCapacity = matched.data.capacityLabel;
+      resolvedPourScore = matched.data.pourScore;
+      resolvedHeatScore = matched.data.heatScore;
+      resolvedPriceTier = matched.data.priceTier;
+      if (!resolvedImage) {
+        resolvedImage = matched.data.image;
+        resolvedImageAlt = matched.data.imageAlt;
+      }
+      if (!resolvedSecondaryUrl && matched.data.secondaryAffiliateUrl) {
+        resolvedSecondaryUrl = matched.data.secondaryAffiliateUrl;
+        resolvedSecondaryName = matched.data.secondaryStoreName ?? 'Specialty Store';
+      }
+    }
+  } catch {
+    // Collection may be unpopulated in early stages
+  }
+}
+
+const clampedPour = Math.max(1, Math.min(10, resolvedPourScore));
+const clampedHeat = Math.max(1, Math.min(10, resolvedHeatScore));
+const pourLabel = formatScore(clampedPour);
+const heatLabel = formatScore(clampedHeat);
+const priceTierLabel =
+  resolvedPriceTier === '$'
+    ? '$ · Budget-Friendly'
+    : resolvedPriceTier === '$$$'
+      ? '$$$ · Artisan Collectibles'
+      : resolvedPriceTier === '$$'
+        ? '$$ · Mid-Range Craft'
+        : undefined;
+const galleryHref = teapotSlug ? `/gallery/${teapotSlug}/` : undefined;
+---
+
+{
+  variant === 'quick-verdict' ? (
+    <section
+      aria-label={`Quick verdict: ${name}`}
+      class="border-y-2 border-t-matcha border-b-border-strong bg-stone/55 py-6 px-5 sm:px-6 space-y-5"
+    >
+      <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-border-subtle">
+        <div class="flex flex-wrap items-center gap-2.5">
+          <span class="eyebrow">Quick Verdict · Top Pick</span>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-matcha text-rice">
+            {badge}
+          </span>
+        </div>
+        {priceTierLabel && (
+          <span class="font-mono text-xs text-muted tabular-nums">{priceTierLabel}</span>
+        )}
+      </div>
+
+      <div class="grid gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
+        <div class="space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-start gap-4">
+            {resolvedImage && (
+              <img
+                src={resolvedImage}
+                alt={resolvedImageAlt}
+                width="160"
+                height="120"
+                class="w-36 aspect-[4/3] sm:w-40 object-cover rounded border border-border-subtle shrink-0"
+              />
+            )}
+            <div class="space-y-1.5">
+              <h2 class="font-serif text-xl sm:text-2xl font-semibold text-charcoal leading-snug">
+                {name}
+              </h2>
+              {bestFor && (
+                <p class="text-sm text-muted">
+                  <strong class="font-semibold text-charcoal">Best for:</strong> {bestFor}
+                </p>
+              )}
+              <p class="font-mono text-xs text-muted pt-1">
+                {resolvedMaterial} · {resolvedCapacity}
+              </p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-6 py-3 border-y border-border-subtle">
+            <div>
+              <div class="flex items-baseline justify-between gap-2 mb-1.5">
+                <span class="font-mono text-[11px] uppercase tracking-wider text-muted">
+                  Pour Precision
+                </span>
+                <span class="font-serif text-lg font-semibold text-charcoal tabular-nums">
+                  {pourLabel}<span class="font-mono text-xs text-muted">/10</span>
+                </span>
+              </div>
+              <div class="score-bar" style={`--score: ${clampedPour}`} aria-hidden="true" />
+            </div>
+            <div>
+              <div class="flex items-baseline justify-between gap-2 mb-1.5">
+                <span class="font-mono text-[11px] uppercase tracking-wider text-muted">
+                  Heat Retention
+                </span>
+                <span class="font-serif text-lg font-semibold text-charcoal tabular-nums">
+                  {heatLabel}<span class="font-mono text-xs text-muted">/10</span>
+                </span>
+              </div>
+              <div
+                class="score-bar"
+                style={`--score: ${clampedHeat}; --score-color: var(--accent-terracotta-text);`}
+                aria-hidden="true"
+              />
+            </div>
+          </div>
+
+          {pros.length > 0 && (
+            <ul class="space-y-1.5 text-sm text-charcoal">
+              {pros.slice(0, 3).map((pro) => (
+                <li class="flex items-start gap-2">
+                  <span class="font-mono font-bold text-matcha shrink-0" aria-hidden="true">
+                    +
+                  </span>
+                  <span>{pro}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div class="flex flex-col gap-2.5 md:w-60 md:border-l md:border-border-subtle md:pl-6">
+          <a
+            href={resolvedAffiliateUrl}
+            target="_blank"
+            rel="nofollow sponsored noopener"
+            class="btn-matcha w-full text-center"
+            data-asin={resolvedAsin}
+          >
+            Check Price on Amazon
+          </a>
+          {galleryHref && (
+            <a href={galleryHref} class="btn-hairline w-full text-center">
+              View Vessel Dossier
+            </a>
+          )}
+          <p class="text-[11px] leading-snug text-muted">
+            Dynamic pricing &amp; stock verified directly on Amazon.
+          </p>
+        </div>
+      </div>
+    </section>
+  ) : variant === 'compact' ? (
+    <aside
+      aria-label={`Recommended vessel: ${name}`}
+      class="my-6 border-y border-border-subtle bg-stone/40 py-4 px-4 sm:px-5 not-prose"
+    >
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-start gap-3.5 min-w-0">
+          {resolvedImage && (
+            <img
+              src={resolvedImage}
+              alt={resolvedImageAlt}
+              width="96"
+              height="72"
+              loading="lazy"
+              class="w-24 aspect-[4/3] object-cover rounded border border-border-subtle shrink-0"
+            />
+          )}
+          <div class="min-w-0 space-y-1">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-matcha-soft text-matcha">
+                {badge}
+              </span>
+              <span class="font-mono text-xs text-muted tabular-nums">
+                Pour {pourLabel}/10 · Heat {heatLabel}/10
+              </span>
+            </div>
+            <h3 class="font-serif text-lg font-semibold text-charcoal leading-snug">{name}</h3>
+            <p class="text-xs font-mono text-muted">
+              {resolvedMaterial} · {resolvedCapacity}
+              {resolvedPriceTier ? ` · ${resolvedPriceTier}` : ''}
+            </p>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:items-end gap-2 shrink-0">
+          <a
+            href={resolvedAffiliateUrl}
+            target="_blank"
+            rel="nofollow sponsored noopener"
+            class="btn-matcha w-full sm:w-auto text-sm"
+            data-asin={resolvedAsin}
+          >
+            Check Price on Amazon
+          </a>
+          {galleryHref && (
+            <a
+              href={galleryHref}
+              class="inline-flex items-center min-h-[44px] px-2 text-xs font-semibold text-matcha underline underline-offset-4 hover:text-terracotta-text"
+            >
+              Read full vessel review
+            </a>
+          )}
+        </div>
+      </div>
+    </aside>
+  ) : (
+    <article class="border-t-2 border-t-charcoal border-x border-b border-border-subtle bg-rice p-6 sm:p-7 space-y-6">
+      <header class="flex flex-wrap items-start justify-between gap-4 pb-5 border-b border-border-subtle">
+        <div class="space-y-1.5 min-w-0 flex-1">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-matcha text-rice">
+              {badge}
+            </span>
+            {priceTierLabel && (
+              <span class="font-mono text-xs text-muted tabular-nums">{priceTierLabel}</span>
+            )}
+          </div>
+          <h3 class="font-serif text-xl sm:text-2xl font-semibold text-charcoal leading-snug">{name}</h3>
+          <p class="font-mono text-xs text-muted">
+            {resolvedMaterial} · {resolvedCapacity}
+          </p>
+        </div>
+
+        {resolvedImage && (
+          <img
+            src={resolvedImage}
+            alt={resolvedImageAlt}
+            width="160"
+            height="120"
+            loading="lazy"
+            class="w-32 aspect-[4/3] sm:w-40 object-cover rounded border border-border-subtle shrink-0"
+          />
+        )}
+      </header>
+
+      {bestFor && (
+        <p class="text-sm text-charcoal leading-relaxed">
+          <span class="eyebrow mr-2">Best For</span>
+          {bestFor}
+        </p>
+      )}
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 py-4 border-y border-border-subtle">
+        <div>
+          <div class="flex items-baseline justify-between gap-2 mb-1.5">
+            <span class="font-mono text-[11px] text-muted uppercase tracking-wider">Pour Precision</span>
+            <span class="font-serif text-xl font-semibold text-charcoal tabular-nums">
+              {pourLabel}<span class="font-mono text-xs text-muted">/10</span>
+            </span>
+          </div>
+          <div class="score-bar" style={`--score: ${clampedPour}`} aria-hidden="true" />
+        </div>
+        <div>
+          <div class="flex items-baseline justify-between gap-2 mb-1.5">
+            <span class="font-mono text-[11px] text-muted uppercase tracking-wider">Heat Retention</span>
+            <span class="font-serif text-xl font-semibold text-charcoal tabular-nums">
+              {heatLabel}<span class="font-mono text-xs text-muted">/10</span>
+            </span>
+          </div>
+          <div
+            class="score-bar"
+            style={`--score: ${clampedHeat}; --score-color: var(--accent-terracotta-text);`}
+            aria-hidden="true"
+          />
+        </div>
+      </div>
+
+      {(pros.length > 0 || cons.length > 0) && (
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-0 sm:divide-x sm:divide-border-subtle text-sm">
+          {pros.length > 0 && (
+            <div class="sm:pr-6">
+              <p class="font-mono text-xs uppercase tracking-wider font-semibold text-matcha mb-2.5">
+                What We Loved
+              </p>
+              <ul class="space-y-1.5 text-charcoal">
+                {pros.map((pro) => (
+                  <li class="flex items-start gap-2">
+                    <span class="font-mono font-bold text-matcha shrink-0" aria-hidden="true">
+                      +
+                    </span>
+                    <span>{pro}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {cons.length > 0 && (
+            <div class="sm:pl-6">
+              <p class="font-mono text-xs uppercase tracking-wider font-semibold text-terracotta-text mb-2.5">
+                Trade-offs
+              </p>
+              <ul class="space-y-1.5 text-muted">
+                {cons.map((con) => (
+                  <li class="flex items-start gap-2">
+                    <span
+                      class="font-mono font-bold text-terracotta-text shrink-0"
+                      aria-hidden="true"
+                    >
+                      –
+                    </span>
+                    <span>{con}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+
+      <footer class="pt-5 border-t border-border-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-2.5">
+          <a
+            href={resolvedAffiliateUrl}
+            target="_blank"
+            rel="nofollow sponsored noopener"
+            class="btn-matcha"
+            data-asin={resolvedAsin}
+          >
+            Check Price on Amazon
+          </a>
+          {resolvedSecondaryUrl && resolvedSecondaryName && (
+            <a
+              href={resolvedSecondaryUrl}
+              target="_blank"
+              rel="nofollow sponsored noopener"
+              class="btn-hairline"
+            >
+              Visit {resolvedSecondaryName}
+            </a>
+          )}
+          {galleryHref && (
+            <a
+              href={galleryHref}
+              class="inline-flex items-center min-h-[44px] px-3 text-sm font-semibold text-charcoal underline underline-offset-4 hover:text-matcha"
+            >
+              Full vessel review &rarr;
+            </a>
+          )}
+        </div>
+        <p class="text-[11px] text-muted">
+          Availability &amp; pricing fluctuate live on Amazon.
+        </p>
+      </footer>
+    </article>
+  )
+}

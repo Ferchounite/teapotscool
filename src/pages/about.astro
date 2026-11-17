@@ -1,0 +1,198 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import DisclosureBanner from '../components/DisclosureBanner.astro';
+import { SITE_URL, EDITORIAL_AUTHOR } from '../lib/clusterUi';
+
+const pagePath = '/about/';
+const pageUrl = new URL(pagePath, SITE_URL).toString();
+
+const aboutSchema: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'AboutPage',
+  name: 'About TeapotsCool — Editorial Standards & Pour Physics Lab',
+  url: pageUrl,
+  description:
+    'Meet Clara Vance and Koko, and learn how TeapotsCool evaluates unique teapots for laminar spout cut-off, thermal retention, and long-term craft.',
+  mainEntity: {
+    '@type': 'Person',
+    name: EDITORIAL_AUTHOR.name,
+    jobTitle: EDITORIAL_AUTHOR.role,
+    url: pageUrl,
+    worksFor: {
+      '@type': 'Organization',
+      name: 'TeapotsCool',
+      url: SITE_URL,
+    },
+  },
+};
+
+const breadcrumbSchema: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
+    { '@type': 'ListItem', position: 2, name: 'About', item: pageUrl },
+  ],
+};
+---
+
+<BaseLayout
+  title="About Clara Vance, Koko & Our Pour Testing Lab | TeapotsCool"
+  description="Meet Clara Vance and studio mascot Koko. Learn how we grade every teapot 1–10 for laminar spout precision, Coandă drip prevention, and 30-minute thermal loss."
+  canonicalPath={pagePath}
+  schemas={[aboutSchema, breadcrumbSchema]}
+>
+  <div class="editorial-container py-8 sm:py-12 space-y-14">
+    <nav aria-label="Breadcrumb" class="text-xs font-mono text-muted">
+      <ol class="flex flex-wrap items-center gap-1.5">
+        <li>
+          <a href="/" class="hover:text-matcha underline underline-offset-4 py-1 inline-block">
+            Home
+          </a>
+        </li>
+        <li aria-hidden="true">/</li>
+        <li aria-current="page" class="text-charcoal font-medium">About &amp; Testing Lab</li>
+      </ol>
+    </nav>
+
+    <header class="space-y-4 max-w-3xl pb-8 border-b border-border-subtle">
+      <p class="eyebrow">Editorial Manifesto &amp; Studio Craft</p>
+      <h1 class="font-serif font-semibold text-charcoal">
+        Why TeapotsCool Exists
+      </h1>
+      <p class="text-lg text-muted leading-relaxed">
+        Great tea vessels sit at the intersection of fluid mechanics, kiln chemistry, and quiet
+        everyday pleasure. Yet most online teapot roundups simply re-package marketplace photos
+        without ever pouring a single cup.
+      </p>
+    </header>
+
+    <!-- Author Persona -->
+    <section aria-labelledby="clara-heading" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div class="lg:col-span-7 space-y-4 max-w-[68ch]">
+        <p class="eyebrow">Lead Curator &amp; Author</p>
+        <h2 id="clara-heading" class="font-serif text-2xl sm:text-3xl font-semibold text-charcoal">
+          Clara Vance — Tea Enthusiast &amp; Product Curator
+        </h2>
+        <p class="text-base text-charcoal leading-relaxed">
+          After years of collecting ceramic teaware across Kyoto, Taipei, and independent studio
+          kilns—and growing frustrated with gorgeous novelty pots that dribbled across linen
+          runners—I founded <strong>TeapotsCool</strong> to apply repeatable engineering checks to
+          expressive teapot design.
+        </p>
+        <p class="text-base text-muted leading-relaxed">
+          Every vessel featured in our <a href="/gallery/" class="font-semibold text-matcha underline underline-offset-4 hover:text-terracotta-text">Curated Gallery</a>
+          or recommended in our <a href="/guides/" class="font-semibold text-matcha underline underline-offset-4 hover:text-terracotta-text">Buying &amp; Care Guides</a>
+          is vetted for spout undercut geometry, lid-vent airflow, basket hydration volume, and
+          honest day-to-day cleaning ergonomics.
+        </p>
+      </div>
+
+      <aside aria-label="Editorial independence" class="lg:col-span-5 border border-border-subtle bg-stone/60 rounded-md p-6 space-y-4">
+        <p class="eyebrow">Editorial Independence</p>
+        <h3 class="font-serif text-xl font-semibold text-charcoal">
+          How We Stay Unbiased
+        </h3>
+        <ul class="space-y-2.5 text-sm text-charcoal">
+          <li class="flex items-start gap-2.5">
+            <span class="font-mono font-bold text-matcha shrink-0" aria-hidden="true">+</span>
+            <span>Zero paid placements or sponsored rankings in any guide or directory card.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <span class="font-mono font-bold text-matcha shrink-0" aria-hidden="true">+</span>
+            <span>Trade-offs and cons documented transparently alongside strengths.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <span class="font-mono font-bold text-matcha shrink-0" aria-hidden="true">+</span>
+            <span>No static dollar prices—links point directly to live retailer availability.</span>
+          </li>
+        </ul>
+      </aside>
+    </section>
+
+    <!-- Meet Koko Mascot Section -->
+    <section
+      aria-labelledby="koko-heading"
+      class="border-y border-border-strong bg-stone/45 py-8 sm:py-10 px-6 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center"
+    >
+      <div class="lg:col-span-5">
+        <div class="border border-border-subtle rounded-md overflow-hidden bg-rice">
+          <img
+            src="/images/brand/mascot-koko-curating.png"
+            alt="Koko the Kyusu tea pet sitting beside studio teapots during pour inspection"
+            width="360"
+            height="270"
+            loading="lazy"
+            decoding="async"
+            class="w-full aspect-[4/3] object-cover"
+          />
+        </div>
+      </div>
+
+      <div class="lg:col-span-7 space-y-4 max-w-[68ch]">
+        <p class="eyebrow">Studio Mascot</p>
+        <h2 id="koko-heading" class="font-serif text-2xl sm:text-3xl font-semibold text-charcoal">
+          Meet Koko: Our Studio Tea Pet &amp; Pour Inspector
+        </h2>
+        <p class="text-base text-charcoal leading-relaxed">
+          In traditional Gongfu tea culture, a clay <em>Chachong</em> ("tea pet") sits on the
+          draining tray beside the brewer—bathed in warm first rinses to keep company during quiet
+          morning steeps.
+        </p>
+        <p class="text-base text-muted leading-relaxed">
+          <strong>Koko</strong> blends that centuries-old tea-pet warmth with the silhouette of a
+          plump terracotta Japanese <em>yokode kyusu</em>, topped with a fresh matcha leaf sprout.
+          Whenever you see Koko beside our <a href="/tools/tea-steeping-timer/" class="font-semibold text-matcha underline underline-offset-4 hover:text-terracotta-text">Tea Steeping Timer</a>
+          or directory notes, it marks tools and vessels vetted for unhurried, joyful brewing.
+        </p>
+      </div>
+    </section>
+
+    <!-- Pour Physics & Thermal Methodology -->
+    <section aria-labelledby="methodology-heading" class="space-y-6">
+      <div class="space-y-2 max-w-2xl">
+        <p class="eyebrow">Repeatable Benchmarks</p>
+        <h2 id="methodology-heading" class="font-serif text-2xl sm:text-3xl font-semibold text-charcoal">
+          Pour Physics &amp; Thermal Testing Methodology
+        </h2>
+        <p class="text-base text-muted">
+          Every vessel in our gallery receives two core 1–10 ratings derived from hands-on bench
+          trials:
+        </p>
+      </div>
+
+      <div class="hairline-grid grid-cols-1 md:grid-cols-2 rounded-md overflow-hidden">
+        <div class="p-6 sm:p-8 space-y-3">
+          <p class="font-mono text-xs uppercase tracking-wider font-semibold text-matcha">
+            Metric 01 · Pour Precision (1–10)
+          </p>
+          <h3 class="font-serif text-xl font-semibold text-charcoal">
+            Laminar Flow &amp; Coandă Cut-Off
+          </h3>
+          <p class="text-sm text-muted leading-relaxed">
+            We test slow, medium, and rapid tilts with plain water and fine broken steamed sencha.
+            A 10/10 score requires a unified glass-smooth stream, zero sputtering from lid vacuum
+            lock, and crisp mid-air stream shear when returning upright—leaving no hanging drop.
+          </p>
+        </div>
+
+        <div class="p-6 sm:p-8 space-y-3">
+          <p class="font-mono text-xs uppercase tracking-wider font-semibold text-terracotta-text">
+            Metric 02 · Heat Retention (1–10)
+          </p>
+          <h3 class="font-serif text-xl font-semibold text-charcoal">
+            30-Minute Thermal Decay Curve
+          </h3>
+          <p class="text-sm text-muted leading-relaxed">
+            Pre-warmed vessels are filled with 95°C water and logged at 3, 10, 20, and 30 minutes
+            using a calibrated thermocouple. Double-walled insulated vessels and enameled cast iron
+            score 9–10, while responsive single-wall glass scores 6–7 by design for cool green
+            teas.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <DisclosureBanner />
+  </div>
+</BaseLayout>

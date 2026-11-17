@@ -1,0 +1,24 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import GalleryLayout from '../../layouts/GalleryLayout.astro';
+import { getTeapotLeafSlug } from '../../lib/clusterUi';
+
+export async function getStaticPaths() {
+  const teapots = await getCollection('teapots');
+  return teapots.map((entry) => ({
+    params: { slug: getTeapotLeafSlug(entry) },
+    props: { entry },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'teapots'>;
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+---
+
+<GalleryLayout entry={entry}>
+  <Content />
+</GalleryLayout>

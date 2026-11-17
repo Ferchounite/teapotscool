@@ -1,0 +1,173 @@
+---
+import { getCollection } from 'astro:content';
+import {
+  type ClusterSlug,
+  getClusterMeta,
+  getClusterHubHref,
+  getGuideLeafSlug,
+  getGuideUrl,
+  estimateReadingTime,
+} from '../lib/clusterUi';
+
+export interface Props {
+  cluster: ClusterSlug;
+  currentSlug: string;
+  isPillar: boolean;
+  mode?: 'sidebar-callout' | 'bottom-related';
+}
+
+const { cluster, currentSlug, isPillar, mode = 'sidebar-callout' } = Astro.props;
+
+const clusterMeta = getClusterMeta(cluster);
+const hubHref = getClusterHubHref(cluster);
+const allGuides = await getCollection('guides');
+const clusterGuides = allGuides
+  .filter((g) => g.data.cluster === cluster)
+  .sort((a, b) => {
+    if (a.data.isPillar !== b.data.isPillar) return a.data.isPillar ? -1 : 1;
+    return b.data.updatedDate.getTime() - a.data.updatedDate.getTime();
+  });
+
+const normalizeLeaf = (slug: string) => slug.split('/').filter(Boolean).pop() ?? slug;
+const currentLeaf = normalizeLeaf(currentSlug);
+
+const pillarGuide = clusterGuides.find((g) => g.data.isPillar);
+const spokeGuides = clusterGuides.filter(
+  (g) => !g.data.isPillar && getGuideLeafSlug(g) !== currentLeaf
+);
+const siblingGuides = clusterGuides.filter((g) => getGuideLeafSlug(g) !== currentLeaf);
+---
+
+{
+  mode === 'sidebar-callout' ? (
+    <aside
+      aria-label="Topic cluster navigation"
+      class="border-t border-border-subtle pt-6 space-y-3"
+    >
+      <p class="eyebrow">{clusterMeta.shortTitle} Series</p>
+
+      {!isPillar ? (
+        pillarGuide ? (
+          <div class="border-l-2 border-l-terracotta pl-4 space-y-2">
+            <h2 class="font-serif text-lg font-semibold text-charcoal leading-snug">
+              Complete Pillar Reference
+            </h2>
+            <p class="text-xs text-muted leading-relaxed">
+              Start from our flagship overview for {clusterMeta.title.toLowerCase()}.
+            </p>
+            <a
+              href={getGuideUrl(pillarGuide)}
+              class="inline-flex items-center min-h-[44px] text-sm font-semibold text-matcha underline underline-offset-4 hover:text-terracotta-text"
+            >
+              {pillarGuide.data.title} &rarr;
+            </a>
+          </div>
+        ) : (
+          <div class="space-y-2">
+            <h2 class="font-serif text-lg font-semibold text-charcoal leading-snug">
+              {clusterMeta.title}
+            </h2>
+            <a
+              href={hubHref}
+              class="inline-flex items-center min-h-[44px] text-sm font-semibold text-matcha underline underline-offset-4 hover:text-terracotta-text"
+            >
+              Browse all guides in this cluster &rarr;
+            </a>
+          </div>
+        )
+      ) : (
+        <div class="space-y-2.5">
+          <h2 class="font-serif text-lg font-semibold text-charcoal leading-snug">
+            In This Pillar Series
+          </h2>
+          {spokeGuides.length > 0 ? (
+            <ol class="divide-y divide-border-subtle border-y border-border-subtle">
+              {spokeGuides.map((spoke, index) => (
+                <li>
+                  <a
+                    href={getGuideUrl(spoke)}
+                    class="flex items-baseline gap-3 min-h-[44px] py-2.5 text-sm font-medium text-charcoal hover:text-matcha transition-colors leading-snug group"
+                  >
+                    <span class="font-mono text-[11px] font-semibold text-terracotta-text tabular-nums shrink-0">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <span class="group-hover:underline underline-offset-4">{spoke.data.title}</span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <a
+              href={hubHref}
+              class="inline-flex items-center min-h-[44px] text-sm font-semibold text-matcha underline underline-offset-4 hover:text-terracotta-text"
+            >
+              Explore {clusterMeta.shortTitle} Hub &rarr;
+            </a>
+          )}
+        </div>
+      )}
+    </aside>
+  ) : (
+    siblingGuides.length > 0 && (
+      <section aria-labelledby="related-cluster-heading" class="pt-12 mt-14 border-t border-border-strong">
+        <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
+          <div>
+            <p class="eyebrow">{clusterMeta.accentLabel}</p>
+            <h2 id="related-cluster-heading" class="font-serif text-2xl sm:text-3xl font-semibold text-charcoal mt-1">
+              Related Guides in This Cluster
+            </h2>
+          </div>
+          <a
+            href={hubHref}
+            class="inline-flex items-center min-h-[44px] text-sm font-semibold text-matcha underline underline-offset-4 hover:text-terracotta-text"
+          >
+            All {clusterMeta.shortTitle} &rarr;
+          </a>
+        </div>
+
+        <div class:list={[
+          'hairline-grid',
+          siblingGuides.length === 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
+        ]}>
+          {siblingGuides.slice(0, 3).map((guide) => (
+            <article class="flex flex-col hover:bg-stone/35 transition-colors">
+              <a href={getGuideUrl(guide)} class="block overflow-hidden border-b border-border-subtle">
+                <img
+                  src={guide.data.featuredImage}
+                  alt={guide.data.featuredImageAlt}
+                  width="640"
+                  height="360"
+                  loading="lazy"
+                  decoding="async"
+                  class="w-full aspect-[16/9] object-cover transition-transform duration-300 hover:scale-[1.02]"
+                />
+              </a>
+              <div class="p-6 flex-1 flex flex-col justify-between gap-4">
+                <div class="space-y-2">
+                  <div class="flex items-center justify-between gap-2 text-xs font-mono text-muted">
+                    <span class="text-terracotta-text font-semibold uppercase tracking-wider">
+                      {guide.data.isPillar ? 'Pillar Guide' : clusterMeta.shortTitle}
+                    </span>
+                    <span class="tabular-nums">{estimateReadingTime(guide.body, guide.data.readingTime)}</span>
+                  </div>
+                  <h3 class="font-serif text-lg sm:text-xl font-semibold text-charcoal leading-snug">
+                    <a href={getGuideUrl(guide)} class="hover:text-matcha transition-colors">
+                      {guide.data.title}
+                    </a>
+                  </h3>
+                  <p class="text-sm text-muted line-clamp-2">{guide.data.description}</p>
+                </div>
+                <a
+                  href={getGuideUrl(guide)}
+                  class="inline-flex items-center min-h-[44px] text-sm font-semibold text-matcha underline underline-offset-4 hover:text-terracotta-text"
+                >
+                  Read guide &rarr;
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    )
+  )
+}

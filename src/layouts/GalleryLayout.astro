@@ -1,0 +1,382 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from './BaseLayout.astro';
+import DisclosureBanner from '../components/DisclosureBanner.astro';
+import {
+  SITE_URL,
+  EDITORIAL_AUTHOR,
+  getClusterMeta,
+  getClusterHubHref,
+  getTeapotLeafSlug,
+  getGuideUrl,
+  estimateReadingTime,
+  formatScore,
+} from '../lib/clusterUi';
+
+export interface Props {
+  entry: CollectionEntry<'teapots'>;
+}
+
+const { entry } = Astro.props;
+const {
+  name,
+  subtitle,
+  description,
+  asin,
+  affiliateUrl,
+  secondaryStoreName,
+  secondaryAffiliateUrl,
+  badge,
+  material,
+  style,
+  capacityLabel,
+  capacityTier,
+  priceTier,
+  pourScore,
+  heatScore,
+  infuserType,
+  stovetopSafe,
+  image,
+  imageAlt,
+  bestFor,
+  pros,
+  cons,
+  verdict,
+  relatedCluster,
+} = entry.data;
+
+const slug = getTeapotLeafSlug(entry);
+const pagePath = `/gallery/${slug}/`;
+const pageUrl = new URL(pagePath, SITE_URL).toString();
+const imageUrl = image.startsWith('http') ? image : new URL(image, SITE_URL).toString();
+const combinedRating = Number(((pourScore + heatScore) / 2).toFixed(1));
+const clampedPour = Math.max(1, Math.min(10, pourScore));
+const clampedHeat = Math.max(1, Math.min(10, heatScore));
+const pourLabel = formatScore(clampedPour);
+const heatLabel = formatScore(clampedHeat);
+const clusterMeta = getClusterMeta(relatedCluster);
+const clusterHubHref = getClusterHubHref(relatedCluster);
+
+let relatedGuides: CollectionEntry<'guides'>[] = [];
+try {
+  const allGuides = await getCollection('guides');
+  relatedGuides = allGuides
+    .filter((g) => g.data.cluster === relatedCluster)
+    .sort((a, b) => {
+      if (a.data.isPillar !== b.data.isPillar) return a.data.isPillar ? -1 : 1;
+      return b.data.updatedDate.getTime() - a.data.updatedDate.getTime();
+    })
+    .slice(0, 3);
+} catch {
+  relatedGuides = [];
+}
+
+const productReviewSchema: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name,
+  description,
+  image: [imageUrl],
+  sku: asin,
+  material,
+  url: pageUrl,
+  review: {
+    '@type': 'Review',
+    name: `${name} — Studio Pour & Thermal Review`,
+    author: {
+      '@type': 'Person',
+      name: EDITORIAL_AUTHOR.name,
+      url: EDITORIAL_AUTHOR.url,
+    },
+    reviewRating: {
+      '@type': 'Rating',
+      ratingValue: combinedRating,
+      bestRating: 10,
+      worstRating: 1,
+    },
+    reviewBody: verdict,
+    positiveNotes: {
+      '@type': 'ItemList',
+      itemListElement: pros.map((pro, idx) => ({
+        '@type': 'ListItem',
+        position: idx + 1,
+        name: pro,
+      })),
+    },
+    negativeNotes: {
+      '@type': 'ItemList',
+      itemListElement: cons.map((con, idx) => ({
+        '@type': 'ListItem',
+        position: idx + 1,
+        name: con,
+      })),
+    },
+  },
+};
+
+const breadcrumbSchema: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
+    { '@type': 'ListItem', position: 2, name: 'Curated Gallery', item: `${SITE_URL}/gallery/` },
+    { '@type': 'ListItem', position: 3, name, item: pageUrl },
+  ],
+};
+---
+
+<BaseLayout
+  title={`${name} Review & Pour Test | TeapotsCool`}
+  description={description}
+  canonicalPath={pagePath}
+  ogImage={image}
+  schemas={[productReviewSchema, breadcrumbSchema]}
+>
+  <article class="editorial-container py-8 sm:py-10 space-y-10">
+    <!-- Breadcrumb -->
+    <nav aria-label="Breadcrumb" class="text-xs font-mono text-muted">
+      <ol class="flex flex-wrap items-center gap-1.5">
+        <li>
+          <a href="/" class="hover:text-matcha underline underline-offset-4 py-1 inline-block">
+            Home
+          </a>
+        </li>
+        <li aria-hidden="true">/</li>
+        <li>
+          <a href="/gallery/" class="hover:text-matcha underline underline-offset-4 py-1 inline-block">
+            Curated Gallery
+          </a>
+        </li>
+        <li aria-hidden="true">/</li>
+        <li aria-current="page" class="text-charcoal font-medium">{name}</li>
+      </ol>
+    </nav>
+
+    <DisclosureBanner />
+
+    <!-- Showcase Split Hero -->
+    <section aria-labelledby="teapot-title" class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+      <div class="lg:col-span-6 border border-border-subtle rounded-md overflow-hidden bg-stone">
+        <img
+          src={image}
+          alt={imageAlt}
+          width="800"
+          height="600"
+          fetchpriority="high"
+          decoding="async"
+          class="w-full aspect-[4/3] object-cover"
+        />
+      </div>
+
+      <div class="lg:col-span-6 space-y-6">
+        <div class="space-y-2.5">
+          <div class="flex flex-wrap items-center gap-2.5">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-mono font-semibold bg-matcha text-rice">
+              {badge}
+            </span>
+            <span class="font-mono text-xs text-muted border border-border-subtle px-2.5 py-1 rounded-full">
+              Tier: {priceTier}
+            </span>
+            <span class="font-mono text-xs text-terracotta-text font-semibold uppercase tracking-wider">
+              {style}
+            </span>
+          </div>
+
+          <h1 id="teapot-title" class="font-serif font-semibold text-charcoal">
+            {name}
+          </h1>
+          <p class="text-lg text-muted leading-relaxed">{subtitle}</p>
+        </div>
+
+        <p class="text-sm text-charcoal bg-stone/70 border-l-4 border-l-matcha px-4 py-3 rounded-r">
+          <strong class="font-semibold">Best For:</strong> {bestFor}
+        </p>
+
+        <!-- Pour & Heat Benchmarks -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4 border-y border-border-subtle">
+          <div>
+            <div class="flex items-center justify-between text-xs font-mono mb-1.5">
+              <span class="text-muted uppercase tracking-wider">Pour Precision</span>
+              <span class="font-semibold text-charcoal tabular-nums">{pourLabel}/10</span>
+            </div>
+            <div class="score-bar" style={`--score: ${clampedPour}`} aria-hidden="true" />
+          </div>
+          <div>
+            <div class="flex items-center justify-between text-xs font-mono mb-1.5">
+              <span class="text-muted uppercase tracking-wider">Heat Retention</span>
+              <span class="font-semibold text-charcoal tabular-nums">{heatLabel}/10</span>
+            </div>
+            <div
+              class="score-bar"
+              style={`--score: ${clampedHeat}; --score-color: var(--accent-terracotta-text);`}
+              aria-hidden="true"
+            />
+          </div>
+        </div>
+
+        <!-- Spec Sheet (<dl> Ledger) -->
+        <dl class="divide-y divide-border-subtle border-y border-border-subtle text-sm">
+          <div class="py-2.5 flex items-baseline justify-between gap-4">
+            <dt class="font-mono text-[11px] uppercase tracking-wider text-muted">Material</dt>
+            <dd class="font-medium text-charcoal text-right">{material}</dd>
+          </div>
+          <div class="py-2.5 flex items-baseline justify-between gap-4">
+            <dt class="font-mono text-[11px] uppercase tracking-wider text-muted">Capacity</dt>
+            <dd class="font-medium text-charcoal text-right">
+              {capacityLabel} <span class="text-xs text-muted">({capacityTier})</span>
+            </dd>
+          </div>
+          <div class="py-2.5 flex items-baseline justify-between gap-4">
+            <dt class="font-mono text-[11px] uppercase tracking-wider text-muted">Infuser Style</dt>
+            <dd class="font-medium text-charcoal text-right">{infuserType}</dd>
+          </div>
+          <div class="py-2.5 flex items-baseline justify-between gap-4">
+            <dt class="font-mono text-[11px] uppercase tracking-wider text-muted">Stovetop Safe</dt>
+            <dd class="font-medium text-charcoal text-right">{stovetopSafe}</dd>
+          </div>
+        </dl>
+
+        <!-- Affiliate CTAs -->
+        <div class="pt-2 space-y-2.5">
+          <div class="flex flex-wrap items-center gap-3">
+            <a
+              href={affiliateUrl}
+              target="_blank"
+              rel="nofollow sponsored noopener"
+              class="btn-matcha"
+              data-asin={asin}
+            >
+              Check Current Price on Amazon
+            </a>
+            {secondaryAffiliateUrl && secondaryStoreName && (
+              <a
+                href={secondaryAffiliateUrl}
+                target="_blank"
+                rel="nofollow sponsored noopener"
+                class="btn-hairline"
+              >
+                View on {secondaryStoreName}
+              </a>
+            )}
+          </div>
+          <p class="text-xs text-muted">
+            Price &amp; availability are dynamic and subject to change on retailer listings.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pros, Cons & Clara Vance Studio Verdict -->
+    <section
+      aria-labelledby="verdict-heading"
+      class="border-y-2 border-t-charcoal border-b-border-strong bg-stone/45 py-7 px-6 sm:px-8 space-y-6"
+    >
+      <div class="flex flex-wrap items-baseline justify-between gap-2 pb-4 border-b border-border-subtle">
+        <div>
+          <p class="eyebrow">Studio Evaluation</p>
+          <h2 id="verdict-heading" class="font-serif text-2xl font-semibold text-charcoal mt-1">
+            Clara Vance’s Pour &amp; Craft Verdict
+          </h2>
+        </div>
+        <span class="font-mono text-sm font-semibold text-matcha tabular-nums">
+          Overall Studio Score: {combinedRating}/10
+        </span>
+      </div>
+
+      <p class="text-base text-charcoal leading-relaxed max-w-[70ch]">{verdict}</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-0 md:divide-x md:divide-border-subtle pt-5 border-t border-border-subtle">
+        <div class="md:pr-8">
+          <h3 class="font-mono text-xs uppercase tracking-wider font-semibold text-matcha mb-3">
+            Why It Stands Out
+          </h3>
+          <ul class="space-y-2 text-sm text-charcoal">
+            {pros.map((pro) => (
+              <li class="flex items-start gap-2.5">
+                <span class="font-mono font-bold text-matcha shrink-0" aria-hidden="true">+</span>
+                <span>{pro}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div class="md:pl-8">
+          <h3 class="font-mono text-xs uppercase tracking-wider font-semibold text-terracotta-text mb-3">
+            Things to Consider
+          </h3>
+          <ul class="space-y-2 text-sm text-muted">
+            {cons.map((con) => (
+              <li class="flex items-start gap-2.5">
+                <span class="font-mono font-bold text-terracotta-text shrink-0" aria-hidden="true">–</span>
+                <span>{con}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Editorial MDX Review Body -->
+    <section aria-label="Detailed teapot review" class="pt-2">
+      <div class="prose prose-tea max-w-[68ch]">
+        <slot />
+      </div>
+    </section>
+
+    <!-- Related Guides from Cluster -->
+    {relatedGuides.length > 0 && (
+      <section aria-labelledby="teapot-guides-heading" class="pt-10 border-t border-border-subtle space-y-6">
+        <div class="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p class="eyebrow">{clusterMeta.accentLabel}</p>
+            <h2 id="teapot-guides-heading" class="font-serif text-2xl sm:text-3xl font-semibold text-charcoal mt-1">
+              Care &amp; Brewing Guides for This Vessel
+            </h2>
+          </div>
+          <a
+            href={clusterHubHref}
+            class="inline-flex items-center min-h-[44px] text-sm font-semibold text-matcha underline underline-offset-4 hover:text-terracotta-text"
+          >
+            Explore {clusterMeta.shortTitle} &rarr;
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {relatedGuides.map((guide) => (
+            <article class="border border-border-subtle bg-rice rounded-md overflow-hidden flex flex-col">
+              <a href={getGuideUrl(guide)} class="block border-b border-border-subtle">
+                <img
+                  src={guide.data.featuredImage}
+                  alt={guide.data.featuredImageAlt}
+                  width="640"
+                  height="360"
+                  loading="lazy"
+                  decoding="async"
+                  class="w-full aspect-[16/9] object-cover"
+                />
+              </a>
+              <div class="p-5 flex-1 flex flex-col justify-between gap-3">
+                <div class="space-y-1.5">
+                  <p class="font-mono text-[11px] uppercase tracking-wider text-terracotta-text font-semibold">
+                    {estimateReadingTime(guide.body, guide.data.readingTime)}
+                  </p>
+                  <h3 class="font-serif text-lg font-semibold text-charcoal leading-snug">
+                    <a href={getGuideUrl(guide)} class="hover:text-matcha">
+                      {guide.data.title}
+                    </a>
+                  </h3>
+                  <p class="text-sm text-muted line-clamp-2">{guide.data.description}</p>
+                </div>
+                <a
+                  href={getGuideUrl(guide)}
+                  class="inline-flex items-center min-h-[44px] text-sm font-semibold text-matcha underline underline-offset-4 hover:text-terracotta-text"
+                >
+                  Read guide &rarr;
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    )}
+  </article>
+</BaseLayout>

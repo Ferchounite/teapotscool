@@ -1,0 +1,21 @@
+---
+export interface Props {
+  schema: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const { schema } = Astro.props;
+const items = Array.isArray(schema)
+  ? schema.filter((entry): entry is Record<string, unknown> => Boolean(entry && typeof entry === 'object'))
+  : schema && typeof schema === 'object'
+    ? [schema]
+    : [];
+
+const serializeJsonLd = (data: Record<string, unknown>): string =>
+  JSON.stringify(data).replace(/</g, '\\u003c');
+---
+
+{
+  items.map((item) => (
+    <script type="application/ld+json" set:html={serializeJsonLd(item)} />
+  ))
+}

@@ -1,0 +1,212 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import DisclosureBanner from '../../components/DisclosureBanner.astro';
+import GalleryFilter from '../../components/GalleryFilter.astro';
+import { SITE_URL, getTeapotUrl, formatScore } from '../../lib/clusterUi';
+
+const teapots = (await getCollection('teapots')).sort((a, b) => {
+  if (a.data.featured !== b.data.featured) return a.data.featured ? -1 : 1;
+  return b.data.pourScore - a.data.pourScore;
+});
+
+const materials = Array.from(new Set(teapots.map((t) => t.data.material))).sort();
+const styles = Array.from(new Set(teapots.map((t) => t.data.style))).sort();
+const capacityTiers = ['Solo (<400ml)', 'Medium (400-750ml)', 'Sharing (750ml+)'].filter((tier) =>
+  teapots.some((t) => t.data.capacityTier === tier)
+);
+const priceTiers = ['$', '$$', '$$$'].filter((tier) =>
+  teapots.some((t) => t.data.priceTier === tier)
+);
+
+const collectionSchema: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Curated Directory of Unique & High-Pour Teapots',
+  description:
+    'Filterable studio directory of borosilicate glass, Japanese kyusu, cast iron tetsubin, and artisan stoneware teapots rated for pour precision and heat retention.',
+  url: `${SITE_URL}/gallery/`,
+};
+
+const itemListSchema: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'TeapotsCool Curated Teapot Directory',
+  numberOfItems: teapots.length,
+  itemListElement: teapots.map((teapot, idx) => ({
+    '@type': 'ListItem',
+    position: idx + 1,
+    url: new URL(getTeapotUrl(teapot), SITE_URL).toString(),
+    name: teapot.data.name,
+  })),
+};
+
+const breadcrumbSchema: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
+    { '@type': 'ListItem', position: 2, name: 'Curated Gallery', item: `${SITE_URL}/gallery/` },
+  ],
+};
+---
+
+<BaseLayout
+  title="Curated Teapot Gallery — Filter by Material, Style & Pour Score | TeapotsCool"
+  description="Browse our curated directory of unique glass, Tokoname kyusu, Yixing clay, porcelain, and cast iron teapots rated hands-on for laminar pour precision and thermal retention."
+  canonicalPath="/gallery/"
+  schemas={[collectionSchema, itemListSchema, breadcrumbSchema]}
+>
+  <div class="editorial-container py-8 sm:py-12 space-y-8">
+    <!-- Directory Header with Koko Curator Note -->
+    <header class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-border-subtle">
+      <div class="space-y-3 max-w-2xl">
+        <p class="eyebrow">Curated Vessel Directory</p>
+        <h1 class="font-serif font-semibold text-charcoal">
+          The Coolest &amp; Most Dependable Teapots
+        </h1>
+        <p class="text-base sm:text-lg text-muted leading-relaxed">
+          Filter across {teapots.length} lab-evaluated teapots by clay or glass material, brewing
+          tradition, cup capacity, and pour physics benchmarks.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-3.5 border-l-2 border-l-matcha pl-4 py-1 shrink-0 max-w-sm">
+        <img
+          src="/images/brand/mascot-koko-curating.png"
+          alt="Koko inspecting handcrafted teapots at the studio bench"
+          width="72"
+          height="54"
+          decoding="async"
+          class="w-[72px] h-[54px] rounded border border-border-subtle object-cover bg-rice shrink-0"
+        />
+        <p class="text-xs text-muted leading-snug">
+          <strong class="font-semibold text-charcoal block">Koko’s Pour Seal</strong>
+          Every entry is bench-tested for drip-free spout cut-off before listing.
+        </p>
+      </div>
+    </header>
+
+    <DisclosureBanner />
+
+    <GalleryFilter
+      materials={materials}
+      styles={styles}
+      capacityTiers={capacityTiers}
+      priceTiers={priceTiers}
+      totalCount={teapots.length}
+    />
+
+    <!-- Directory Grid -->
+    <section aria-label="Curated teapot results">
+      <div id="teapot-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {teapots.map((teapot, idx) => {
+          const href = getTeapotUrl(teapot);
+          const pourStr = formatScore(teapot.data.pourScore);
+          const heatStr = formatScore(teapot.data.heatScore);
+          const searchText = [
+            teapot.data.name,
+            teapot.data.subtitle,
+            teapot.data.material,
+            teapot.data.style,
+            teapot.data.badge,
+            teapot.data.bestFor,
+          ].join(' ');
+
+          return (
+            <article
+              class="teapot-card border border-border-subtle bg-rice rounded-md overflow-hidden flex flex-col"
+              data-material={teapot.data.material}
+              data-style={teapot.data.style}
+              data-capacity-tier={teapot.data.capacityTier}
+              data-price-tier={teapot.data.priceTier}
+              data-pour-score={teapot.data.pourScore}
+              data-heat-score={teapot.data.heatScore}
+              data-featured={teapot.data.featured ? 'true' : 'false'}
+              data-name={teapot.data.name}
+              data-search-text={searchText}
+            >
+              <a href={href} class="block border-b border-border-subtle overflow-hidden">
+                <img
+                  src={teapot.data.image}
+                  alt={teapot.data.imageAlt}
+                  width="640"
+                  height="480"
+                  loading={idx < 3 ? undefined : 'lazy'}
+                  fetchpriority={idx === 0 ? 'high' : undefined}
+                  decoding="async"
+                  class="w-full aspect-[4/3] object-cover transition-transform duration-300 hover:scale-[1.02]"
+                />
+              </a>
+
+              <div class="p-5 flex-1 flex flex-col justify-between gap-5">
+                <div class="space-y-2.5">
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-matcha text-rice">
+                      {teapot.data.badge}
+                    </span>
+                    <span class="font-mono text-xs text-muted">
+                      {teapot.data.style} · {teapot.data.priceTier}
+                    </span>
+                  </div>
+
+                  <h2 class="font-serif text-xl font-semibold text-charcoal leading-snug">
+                    <a href={href} class="hover:text-matcha transition-colors">
+                      {teapot.data.name}
+                    </a>
+                  </h2>
+
+                  <p class="font-mono text-xs text-muted">
+                    {teapot.data.material} · {teapot.data.capacityLabel}
+                  </p>
+
+                  <p class="text-sm text-muted leading-relaxed line-clamp-2">
+                    {teapot.data.subtitle}
+                  </p>
+                </div>
+
+                <div class="space-y-4">
+                  <div class="grid grid-cols-2 gap-3 pt-3 border-t border-border-subtle">
+                    <div>
+                      <div class="flex items-center justify-between text-[11px] font-mono mb-1">
+                        <span class="text-muted">Pour</span>
+                        <span class="font-semibold text-charcoal tabular-nums">{pourStr}/10</span>
+                      </div>
+                      <div class="score-bar" style={`--score: ${teapot.data.pourScore}`} aria-hidden="true" />
+                    </div>
+                    <div>
+                      <div class="flex items-center justify-between text-[11px] font-mono mb-1">
+                        <span class="text-muted">Heat</span>
+                        <span class="font-semibold text-charcoal tabular-nums">{heatStr}/10</span>
+                      </div>
+                      <div
+                        class="score-bar"
+                        style={`--score: ${teapot.data.heatScore}; --score-color: var(--accent-terracotta-text);`}
+                        aria-hidden="true"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="flex flex-wrap items-center gap-2.5">
+                    <a href={href} class="btn-hairline flex-1 text-sm">
+                      Full Review
+                    </a>
+                    <a
+                      href={teapot.data.affiliateUrl}
+                      target="_blank"
+                      rel="nofollow sponsored noopener"
+                      class="btn-matcha flex-1 text-sm"
+                      data-asin={teapot.data.asin}
+                    >
+                      Amazon Price
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  </div>
+</BaseLayout>
