@@ -1,0 +1,471 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FaqAccordion, { type FaqItem } from '../../components/FaqAccordion.astro';
+import DisclosureBanner from '../../components/DisclosureBanner.astro';
+import { SITE_URL } from '../../lib/clusterUi';
+
+const pagePath = '/tools/tea-ratio-calculator/';
+const pageUrl = new URL(pagePath, SITE_URL).toString();
+
+const calcFaqs: FaqItem[] = [
+  {
+    question: 'Why does a gram scale beat teaspoons for loose-leaf tea?',
+    answer:
+      'Tea leaf density varies dramatically by cultivar and processing. A tablespoon of fluffy Silver Needle white tea weighs roughly 2 grams, while an equal volume of tightly rolled Alishan oolong weighs 6 to 8 grams. Weighing dry leaf per 100ml of teapot volume prevents over-caffeinated bitterness.',
+  },
+  {
+    question: 'What is the difference between Western, Japanese Kyusu, and Gongfu ratios?',
+    answer:
+      'Western pot brewing uses roughly 1 to 1.2 grams per 100ml with 2- to 5-minute steeps for a single big pot. Traditional Japanese kyusu brewing raises leaf density to ~2.5g per 100ml for vibrant 45- to 90-second umami extractions. Gongfu Cha packs 5 to 7 grams per 100ml into a tiny clay pot for 10-second flash pours.',
+  },
+  {
+    question: 'Should I fill my teapot to its full rim capacity?',
+    answer:
+      'Leave roughly 10% headspace below the spout collar in daily Western and kyusu teapots so wet leaves can unfurl cleanly without blocking lid vent holes or choking spout airflow.',
+  },
+];
+
+const webAppSchema: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'TeapotsCool Tea Leaf Ratio & Capacity Calculator',
+  url: pageUrl,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Any (Web Browser)',
+  description:
+    'Interactive tea-to-water ratio calculator computing grams, level teaspoons, water temperatures, and re-steep counts for any teapot capacity from 100ml to 1500ml.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+};
+
+const faqSchema: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: calcFaqs.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: { '@type': 'Answer', text: item.answer },
+  })),
+};
+
+const breadcrumbSchema: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
+    { '@type': 'ListItem', position: 2, name: 'Tea Ratio Calculator', item: pageUrl },
+  ],
+};
+---
+
+<BaseLayout
+  title="Tea Leaf Ratio & Teapot Size Calculator | TeapotsCool"
+  description="Calculate exact loose-leaf tea weight in grams and teaspoons for any teapot size (100ml to 1500ml) across Gongfu, Kyusu, and Western steeping styles."
+  canonicalPath={pagePath}
+  schemas={[webAppSchema, faqSchema, breadcrumbSchema]}
+>
+  <div class="editorial-container py-8 sm:py-12 space-y-12">
+    <nav aria-label="Breadcrumb" class="text-xs font-mono text-muted">
+      <ol class="flex flex-wrap items-center gap-1.5">
+        <li>
+          <a href="/" class="hover:text-matcha underline underline-offset-4 py-1 inline-block">
+            Home
+          </a>
+        </li>
+        <li aria-hidden="true">/</li>
+        <li>
+          <a href="/tools/tea-steeping-timer/" class="hover:text-matcha underline underline-offset-4 py-1 inline-block">
+            Lab Tools
+          </a>
+        </li>
+        <li aria-hidden="true">/</li>
+        <li aria-current="page" class="text-charcoal font-medium">Tea Ratio Calculator</li>
+      </ol>
+    </nav>
+
+    <header class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center pb-8 border-b border-border-subtle">
+      <div class="lg:col-span-8 space-y-3">
+        <p class="eyebrow">Precision Brewing Calculator · Zero Guesswork</p>
+        <h1 class="font-serif font-semibold text-charcoal">
+          Loose-Leaf Tea &amp; Teapot Capacity Ratio Calculator
+        </h1>
+        <p class="text-base sm:text-lg text-muted leading-relaxed max-w-[64ch]">
+          Dial in exact grams, level teaspoons, fluid ounces, and water temperatures for any teapot
+          size—from a 160ml Yixing Gongfu pot to a 1200ml family glass carafe.
+        </p>
+      </div>
+
+      <div class="lg:col-span-4 border border-border-subtle bg-stone/75 rounded-md p-4 flex items-center gap-4">
+        <img
+          src="/images/brand/mascot-koko-steeping.png"
+          alt="Koko the Kyusu tea pet beside measured dry leaves"
+          width="88"
+          height="66"
+          class="w-[88px] h-[66px] rounded border border-border-subtle object-cover bg-rice shrink-0"
+        />
+        <p class="text-xs text-muted leading-snug">
+          <strong class="font-semibold text-charcoal block mb-0.5">Koko’s Hydration Rule</strong>
+          Rolled oolongs triple in volume—always check our{' '}
+          <a href="/guides/buying-guides/teapot-size-chart-guide/" class="text-matcha underline underline-offset-2">
+            Teapot Size Chart
+          </a>.
+        </p>
+      </div>
+    </header>
+
+    <section
+      aria-label="Interactive tea ratio calculator"
+      class="border border-border-subtle bg-rice rounded-md overflow-hidden"
+      data-ratio-calc
+    >
+      <div class="grid grid-cols-1 lg:grid-cols-12">
+        <!-- Controls -->
+        <div class="lg:col-span-7 p-6 sm:p-8 space-y-6 border-b lg:border-b-0 lg:border-r border-border-subtle">
+          <div class="space-y-2">
+            <label for="tea-type-select" class="eyebrow block">1. Select Tea Family</label>
+            <select
+              id="tea-type-select"
+              data-tea-select
+              class="w-full min-h-[44px] px-3.5 py-2 border border-border-strong rounded bg-rice text-charcoal text-sm font-medium focus:outline-none focus:border-matcha"
+            >
+              <option value="sencha">Japanese Green (Sencha / Kabusecha) — Fluffy Needles</option>
+              <option value="gyokuro">Shaded Green (Gyokuro) — Dense Umami Needles</option>
+              <option value="rolled-oolong">Rolled Oolong (Tieguanyin / Alishan) — Dense Balls</option>
+              <option value="strip-oolong">Strip Oolong (Wuyi Rock / Dancong) — Twisty Leaves</option>
+              <option value="black">Black Tea (Assam / Darjeeling / Keemun) — Broken or Whole</option>
+              <option value="white">White Tea (Silver Needle / Bai Mudan) — Voluminous Buds</option>
+              <option value="puerh">Ripe Pu-erh (Shou Cake / Loose) — Compressed Dark Leaf</option>
+              <option value="herbal">Herbal / Tisane (Chamomile / Rooibos) — Caffeine-Free</option>
+            </select>
+          </div>
+
+          <div class="space-y-2.5">
+            <span class="eyebrow block">2. Brewing Style</span>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5" role="group" aria-label="Brewing style">
+              <button
+                type="button"
+                data-style-btn="western"
+                aria-pressed="true"
+                class="min-h-[44px] px-3 py-2 rounded border text-left transition-colors border-matcha bg-matcha-soft text-matcha font-semibold text-xs"
+              >
+                <span class="block font-serif text-sm">Western Pot</span>
+                <span class="font-mono text-[10px] opacity-85">1.0–1.3g / 100ml</span>
+              </button>
+              <button
+                type="button"
+                data-style-btn="kyusu"
+                aria-pressed="false"
+                class="min-h-[44px] px-3 py-2 rounded border text-left transition-colors border-border-strong bg-rice text-charcoal text-xs hover:bg-stone/50"
+              >
+                <span class="block font-serif text-sm">Japanese Kyusu</span>
+                <span class="font-mono text-[10px] text-muted">2.0–3.0g / 100ml</span>
+              </button>
+              <button
+                type="button"
+                data-style-btn="gongfu"
+                aria-pressed="false"
+                class="min-h-[44px] px-3 py-2 rounded border text-left transition-colors border-border-strong bg-rice text-charcoal text-xs hover:bg-stone/50"
+              >
+                <span class="block font-serif text-sm">Gongfu Flash</span>
+                <span class="font-mono text-[10px] text-muted">5.0–7.0g / 100ml</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <div class="flex items-baseline justify-between gap-2">
+              <label for="vessel-ml-range" class="eyebrow">3. Teapot Water Volume</label>
+              <span class="font-mono text-sm font-semibold text-charcoal tabular-nums" data-ml-readout>
+                500 ml (16.9 fl oz · 2 mugs)
+              </span>
+            </div>
+
+            <input
+              id="vessel-ml-range"
+              type="range"
+              min="100"
+              max="1500"
+              step="20"
+              value="500"
+              data-ml-slider
+              class="w-full accent-matcha cursor-pointer h-3"
+            />
+
+            <div class="flex flex-wrap gap-2 pt-1">
+              {[
+                { ml: 160, label: '160ml Yixing' },
+                { ml: 320, label: '320ml Kyusu' },
+                { ml: 450, label: '450ml Solo' },
+                { ml: 700, label: '700ml Hario' },
+                { ml: 1200, label: '1200ml Pot' },
+              ].map((p) => (
+                <button
+                  type="button"
+                  data-ml-preset={String(p.ml)}
+                  class="min-h-[38px] px-2.5 py-1 rounded border border-border-subtle bg-stone/55 text-xs font-mono text-charcoal hover:border-matcha hover:text-matcha transition-colors"
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <!-- Output Readout -->
+        <div
+          class="lg:col-span-5 bg-stone/55 p-6 sm:p-8 flex flex-col justify-between gap-6"
+          aria-live="polite"
+        >
+          <div class="space-y-5">
+            <div class="pb-4 border-b border-border-subtle">
+              <p class="eyebrow">Recommended Dry Leaf Charge</p>
+              <div class="flex items-baseline gap-3 mt-1.5">
+                <span class="font-serif text-5xl font-semibold text-matcha tabular-nums" data-grams-out>
+                  5.5g
+                </span>
+                <span class="font-mono text-sm text-muted tabular-nums" data-tsp-out>
+                  (~2.2 level tsp)
+                </span>
+              </div>
+              <p class="text-xs text-muted mt-2" data-vessel-advice>
+                Ideal teapot class: 450ml–700ml medium loose-leaf teapot.
+              </p>
+            </div>
+
+            <dl class="divide-y divide-border-subtle text-sm">
+              <div class="py-2.5 flex items-baseline justify-between gap-4">
+                <dt class="font-mono text-[11px] uppercase tracking-wider text-muted">Target Water Temp</dt>
+                <dd class="font-mono font-semibold text-terracotta-text tabular-nums" data-temp-out>
+                  80°C / 176°F
+                </dd>
+              </div>
+              <div class="py-2.5 flex items-baseline justify-between gap-4">
+                <dt class="font-mono text-[11px] uppercase tracking-wider text-muted">First Steep</dt>
+                <dd class="font-mono font-semibold text-charcoal tabular-nums" data-steep-out>
+                  120 sec
+                </dd>
+              </div>
+              <div class="py-2.5 flex items-baseline justify-between gap-4">
+                <dt class="font-mono text-[11px] uppercase tracking-wider text-muted">Total Re-Steeps</dt>
+                <dd class="font-mono font-semibold text-charcoal tabular-nums" data-resteep-out>
+                  3 infusions
+                </dd>
+              </div>
+              <div class="py-2.5 flex items-baseline justify-between gap-4">
+                <dt class="font-mono text-[11px] uppercase tracking-wider text-muted">Best Vessel Match</dt>
+                <dd class="text-right">
+                  <a
+                    href="/gallery/tokoname-gyokko-yokode-kyusu/"
+                    data-vessel-link
+                    class="font-semibold text-matcha underline underline-offset-4 hover:text-terracotta-text"
+                  >
+                    <span data-vessel-name>Tokoname Gyokko Kyusu</span> &rarr;
+                  </a>
+                </dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="flex flex-wrap gap-2.5 pt-2">
+            <a href="/tools/tea-steeping-timer/" class="btn-matcha flex-1 text-sm text-center">
+              Open Steep Timer &rarr;
+            </a>
+            <a href="/tools/teapot-quiz/" class="btn-hairline flex-1 text-sm text-center">
+              Take Teapot Quiz &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <FaqAccordion faqs={calcFaqs} emitSchema={false} />
+    <DisclosureBanner />
+  </div>
+</BaseLayout>
+
+<script>
+  function initTeaRatioCalculator() {
+    const root = document.querySelector<HTMLElement>('[data-ratio-calc]');
+    if (!root || root.dataset.bound === 'true') return;
+    root.dataset.bound = 'true';
+
+    const TEA_DATA = {
+      sencha: {
+        temp: '78°C / 172°F',
+        gramsPerTsp: 2.3,
+        rates: { western: 1.1, kyusu: 2.5, gongfu: 5.0 },
+        steep: { western: '120 sec', kyusu: '60 sec', gongfu: '25 sec' },
+        resteep: { western: '2–3 infusions', kyusu: '3 infusions', gongfu: '5 infusions' },
+        vesselName: 'Tokoname Gyokko Kyusu',
+        vesselHref: '/gallery/tokoname-gyokko-yokode-kyusu/',
+      },
+      gyokuro: {
+        temp: '60°C / 140°F',
+        gramsPerTsp: 2.8,
+        rates: { western: 1.5, kyusu: 3.5, gongfu: 6.5 },
+        steep: { western: '120 sec', kyusu: '90 sec', gongfu: '45 sec' },
+        resteep: { western: '3 infusions', kyusu: '4 infusions', gongfu: '6 infusions' },
+        vesselName: 'Tokoname Gyokko Kyusu',
+        vesselHref: '/gallery/tokoname-gyokko-yokode-kyusu/',
+      },
+      'rolled-oolong': {
+        temp: '93°C / 200°F',
+        gramsPerTsp: 4.5,
+        rates: { western: 1.2, kyusu: 2.8, gongfu: 6.0 },
+        steep: { western: '180 sec', kyusu: '60 sec', gongfu: '25 sec (after 5s rinse)' },
+        resteep: { western: '3 infusions', kyusu: '5 infusions', gongfu: '8–10 infusions' },
+        vesselName: 'Hario ChaCha Kyusu Maru',
+        vesselHref: '/gallery/hario-chacha-kyusu-maru-700/',
+      },
+      'strip-oolong': {
+        temp: '96°C / 205°F',
+        gramsPerTsp: 2.2,
+        rates: { western: 1.1, kyusu: 2.4, gongfu: 5.5 },
+        steep: { western: '180 sec', kyusu: '50 sec', gongfu: '15 sec' },
+        resteep: { western: '3 infusions', kyusu: '5 infusions', gongfu: '8 infusions' },
+        vesselName: 'Yixing Zhuni Shui Ping',
+        vesselHref: '/gallery/yixing-zhuni-shui-ping-clay-teapot/',
+      },
+      black: {
+        temp: '96°C / 205°F',
+        gramsPerTsp: 2.6,
+        rates: { western: 1.2, kyusu: 2.2, gongfu: 5.0 },
+        steep: { western: '210 sec', kyusu: '60 sec', gongfu: '15 sec' },
+        resteep: { western: '1–2 infusions', kyusu: '3 infusions', gongfu: '6 infusions' },
+        vesselName: 'Bredemeijer Duet Insulated Pot',
+        vesselHref: '/gallery/bredemeijer-duet-bella-ronde-insulated/',
+      },
+      white: {
+        temp: '85°C / 185°F',
+        gramsPerTsp: 1.2,
+        rates: { western: 1.0, kyusu: 2.2, gongfu: 4.5 },
+        steep: { western: '240 sec', kyusu: '75 sec', gongfu: '25 sec' },
+        resteep: { western: '2–3 infusions', kyusu: '4 infusions', gongfu: '7 infusions' },
+        vesselName: 'Sweese Fluted Porcelain Pot',
+        vesselHref: '/gallery/sweese-porcelain-fluted-infuser-teapot/',
+      },
+      puerh: {
+        temp: '100°C / 212°F',
+        gramsPerTsp: 3.5,
+        rates: { western: 1.3, kyusu: 2.8, gongfu: 6.5 },
+        steep: { western: '240 sec', kyusu: '45 sec', gongfu: '10 sec (after 10s rinse)' },
+        resteep: { western: '4 infusions', kyusu: '6 infusions', gongfu: '10–14 infusions' },
+        vesselName: 'Yixing Zhuni Shui Ping',
+        vesselHref: '/gallery/yixing-zhuni-shui-ping-clay-teapot/',
+      },
+      herbal: {
+        temp: '100°C / 212°F',
+        gramsPerTsp: 1.8,
+        rates: { western: 1.3, kyusu: 2.0, gongfu: 3.5 },
+        steep: { western: '300 sec (5m)', kyusu: '180 sec', gongfu: '60 sec' },
+        resteep: { western: '1–2 infusions', kyusu: '2 infusions', gongfu: '3 infusions' },
+        vesselName: 'Teabloom Stovetop Glass Pot',
+        vesselHref: '/gallery/teabloom-celebration-stovetop-glass/',
+      },
+    } as const;
+
+    type TeaKey = keyof typeof TEA_DATA;
+    type StyleKey = 'western' | 'kyusu' | 'gongfu';
+
+    let currentTea: TeaKey = 'sencha';
+    let currentStyle: StyleKey = 'western';
+    let currentMl = 500;
+
+    const selectEl = root.querySelector<HTMLSelectElement>('[data-tea-select]');
+    const styleBtns = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-style-btn]'));
+    const sliderEl = root.querySelector<HTMLInputElement>('[data-ml-slider]');
+    const presetBtns = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-ml-preset]'));
+
+    const mlReadout = root.querySelector('[data-ml-readout]');
+    const gramsOut = root.querySelector('[data-grams-out]');
+    const tspOut = root.querySelector('[data-tsp-out]');
+    const adviceOut = root.querySelector('[data-vessel-advice]');
+    const tempOut = root.querySelector('[data-temp-out]');
+    const steepOut = root.querySelector('[data-steep-out]');
+    const resteepOut = root.querySelector('[data-resteep-out]');
+    const vesselLink = root.querySelector<HTMLAnchorElement>('[data-vessel-link]');
+    const vesselName = root.querySelector('[data-vessel-name]');
+
+    const render = () => {
+      const tea = TEA_DATA[currentTea];
+      const rate = tea.rates[currentStyle];
+      const grams = Math.max(1.5, Number(((currentMl / 100) * rate).toFixed(1)));
+      const tsp = (grams / tea.gramsPerTsp).toFixed(1);
+      const oz = (currentMl * 0.033814).toFixed(1);
+      const mugs = (currentMl / 240).toFixed(1);
+
+      if (mlReadout) mlReadout.textContent = `${currentMl} ml (${oz} fl oz · ${mugs} cups)`;
+      if (gramsOut) gramsOut.textContent = `${grams}g`;
+      if (tspOut) tspOut.textContent = `(~${tsp} level tsp)`;
+      if (tempOut) tempOut.textContent = tea.temp;
+      if (steepOut) steepOut.textContent = tea.steep[currentStyle];
+      if (resteepOut) resteepOut.textContent = tea.resteep[currentStyle];
+      if (vesselName) vesselName.textContent = tea.vesselName;
+      if (vesselLink) vesselLink.href = tea.vesselHref;
+
+      if (adviceOut) {
+        if (currentMl <= 220) {
+          adviceOut.textContent = 'Solo Gongfu sizing—ideal for dense multi-round infusions.';
+        } else if (currentMl <= 500) {
+          adviceOut.textContent = '1–2 person daily kyusu/studio vessel sizing.';
+        } else if (currentMl <= 850) {
+          adviceOut.textContent = '2–3 mug shared table vessel sizing.';
+        } else {
+          adviceOut.textContent = 'Large pot (4+ cups)—insulated steel or cast iron retains heat best.';
+        }
+      }
+
+      styleBtns.forEach((btn) => {
+        const active = btn.dataset.styleBtn === currentStyle;
+        btn.setAttribute('aria-pressed', String(active));
+        btn.classList.toggle('border-matcha', active);
+        btn.classList.toggle('bg-matcha-soft', active);
+        btn.classList.toggle('text-matcha', active);
+        btn.classList.toggle('font-semibold', active);
+        btn.classList.toggle('border-border-strong', !active);
+        btn.classList.toggle('bg-rice', !active);
+        btn.classList.toggle('text-charcoal', !active);
+      });
+    };
+
+    selectEl?.addEventListener('change', () => {
+      const val = selectEl.value as TeaKey;
+      if (TEA_DATA[val]) {
+        currentTea = val;
+        render();
+      }
+    });
+
+    styleBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const s = btn.dataset.styleBtn as StyleKey;
+        if (s) {
+          currentStyle = s;
+          if (s === 'gongfu' && currentMl > 400 && sliderEl) {
+            currentMl = 160;
+            sliderEl.value = '160';
+          }
+          render();
+        }
+      });
+    });
+
+    sliderEl?.addEventListener('input', () => {
+      currentMl = Number(sliderEl.value) || 500;
+      render();
+    });
+
+    presetBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const ml = Number(btn.dataset.mlPreset) || 500;
+        currentMl = ml;
+        if (sliderEl) sliderEl.value = String(ml);
+        render();
+      });
+    });
+
+    render();
+  }
+
+  initTeaRatioCalculator();
+  document.addEventListener('astro:page-load', initTeaRatioCalculator);
+</script>

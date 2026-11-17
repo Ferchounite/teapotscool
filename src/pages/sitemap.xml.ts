@@ -22,6 +22,8 @@ const STATIC_ROUTES: readonly StaticRouteConfig[] = [
   { path: '/guides/care-maintenance/', changefreq: 'weekly', priority: '0.8' },
   { path: '/guides/materials/', changefreq: 'weekly', priority: '0.8' },
   { path: '/tools/tea-steeping-timer/', changefreq: 'monthly', priority: '0.8' },
+  { path: '/tools/tea-ratio-calculator/', changefreq: 'monthly', priority: '0.8' },
+  { path: '/tools/teapot-quiz/', changefreq: 'monthly', priority: '0.8' },
   { path: '/about/', changefreq: 'monthly', priority: '0.5' },
   { path: '/privacy-policy/', changefreq: 'yearly', priority: '0.3' },
 ];

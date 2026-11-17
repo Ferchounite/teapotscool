@@ -61,7 +61,12 @@ const isCurrent = (href: string) =>
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
-    {noindex && <meta name="robots" content="noindex, follow" />}
+    <meta
+      name="robots"
+      content={noindex
+        ? 'noindex, follow'
+        : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'}
+    />
     <meta name="theme-color" content="#FAF8F5" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     {gscVerificationToken && <meta name="google-site-verification" content={gscVerificationToken} />}
@@ -304,6 +309,16 @@ const isCurrent = (href: string) =>
               <li>
                 <a href="/tools/tea-steeping-timer/" class="inline-flex items-center min-h-[44px] text-charcoal hover:text-matcha">
                   Interactive Tea Steeping Timer
+                </a>
+              </li>
+              <li>
+                <a href="/tools/tea-ratio-calculator/" class="inline-flex items-center min-h-[44px] text-charcoal hover:text-matcha">
+                  Tea Leaf Ratio Calculator
+                </a>
+              </li>
+              <li>
+                <a href="/tools/teapot-quiz/" class="inline-flex items-center min-h-[44px] text-charcoal hover:text-matcha">
+                  30-Second Teapot Matcher Quiz
                 </a>
               </li>
               <li>

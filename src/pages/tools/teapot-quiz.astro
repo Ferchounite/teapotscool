@@ -1,0 +1,323 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FaqAccordion, { type FaqItem } from '../../components/FaqAccordion.astro';
+import DisclosureBanner from '../../components/DisclosureBanner.astro';
+import { SITE_URL } from '../../lib/clusterUi';
+
+const pagePath = '/tools/teapot-quiz/';
+const pageUrl = new URL(pagePath, SITE_URL).toString();
+
+const quizFaqs: FaqItem[] = [
+  {
+    question: 'Why cannot a single teapot brew every type of tea equally well?',
+    answer:
+      'Delicate Japanese green teas require cooler ~80°C water and reactive unglazed Tokoname or thin glass so leaves do not stew into bitterness, whereas aged pu-erh and dark roasted oolongs demand sustained near-boiling heat inside dense stoneware, glazed porcelain, or enameled cast iron.',
+  },
+  {
+    question: 'Should I prioritize pour score or stovetop safety?',
+    answer:
+      'Almost 85% of tea drinkers heat water in an electric kettle rather than on a stove burner—so spout shear precision (Pour Score) and easy cleaning make a much bigger daily difference unless you intentionally simmer flowering teas or herbal decoctions over low flame.',
+  },
+];
+
+const webAppSchema: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'TeapotsCool 30-Second Teapot Material Matcher Quiz',
+  url: pageUrl,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Any (Web Browser)',
+  description:
+    'Interactive 4-question teapot material selector matching tea preferences, cup count, stovetop needs, and cleaning habits to tested ceramic, clay, glass, and cast iron vessels.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+};
+
+const breadcrumbSchema: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
+    { '@type': 'ListItem', position: 2, name: 'Teapot Matcher Quiz', item: pageUrl },
+  ],
+};
+---
+
+<BaseLayout
+  title="30-Second Teapot Material Matcher Quiz | TeapotsCool"
+  description="Answer 4 quick brewing questions to match your favorite teas, stove setup, and cup count to the best clay, glass, porcelain, or cast iron teapot."
+  canonicalPath={pagePath}
+  schemas={[webAppSchema, breadcrumbSchema]}
+>
+  <div class="editorial-container py-8 sm:py-12 space-y-12">
+    <nav aria-label="Breadcrumb" class="text-xs font-mono text-muted">
+      <ol class="flex flex-wrap items-center gap-1.5">
+        <li>
+          <a href="/" class="hover:text-matcha underline underline-offset-4 py-1 inline-block">
+            Home
+          </a>
+        </li>
+        <li aria-hidden="true">/</li>
+        <li>
+          <a href="/gallery/" class="hover:text-matcha underline underline-offset-4 py-1 inline-block">
+            Curated Gallery
+          </a>
+        </li>
+        <li aria-hidden="true">/</li>
+        <li aria-current="page" class="text-charcoal font-medium">Teapot Matcher Quiz</li>
+      </ol>
+    </nav>
+
+    <header class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center pb-8 border-b border-border-subtle">
+      <div class="lg:col-span-8 space-y-3">
+        <p class="eyebrow">4 Questions · Instant Material Match</p>
+        <h1 class="font-serif font-semibold text-charcoal">
+          30-Second Teapot Material &amp; Vessel Matcher
+        </h1>
+        <p class="text-base sm:text-lg text-muted leading-relaxed max-w-[64ch]">
+          Not sure whether you need unglazed Tokoname clay, heavy cast iron, borosilicate glass, or
+          double-walled porcelain? Match your daily tea habits to the right lab-tested vessel.
+        </p>
+      </div>
+
+      <div class="lg:col-span-4 border border-border-subtle bg-stone/75 rounded-md p-4 flex items-center gap-4">
+        <img
+          src="/images/brand/mascot-koko-curating.png"
+          alt="Koko the Kyusu inspecting different clay and glass teapots"
+          width="88"
+          height="66"
+          class="w-[88px] h-[66px] rounded border border-border-subtle object-cover bg-rice shrink-0"
+        />
+        <p class="text-xs text-muted leading-snug">
+          <strong class="font-semibold text-charcoal block mb-0.5">Koko’s Match Seal</strong>
+          Recommendations use our 10-vessel{' '}
+          <a href="/about/" class="text-matcha underline underline-offset-2">Pour &amp; Heat Lab</a>{' '}
+          benchmarks.
+        </p>
+      </div>
+    </header>
+
+    <section
+      aria-label="Teapot quiz"
+      class="border border-border-subtle bg-rice rounded-md overflow-hidden"
+      data-teapot-quiz
+    >
+      <div class="grid grid-cols-1 lg:grid-cols-12">
+        <div class="lg:col-span-7 p-6 sm:p-8 space-y-6 border-b lg:border-b-0 lg:border-r border-border-subtle">
+          <div class="space-y-2">
+            <label for="quiz-tea" class="eyebrow block">1. What do you steep most often?</label>
+            <select
+              id="quiz-tea"
+              data-quiz-tea
+              class="w-full min-h-[44px] px-3.5 py-2 border border-border-strong rounded bg-rice text-charcoal text-sm font-medium focus:outline-none focus:border-matcha"
+            >
+              <option value="green">Japanese Green Teas (Sencha, Gyokuro, Matcha blends)</option>
+              <option value="oolong">Roasted Oolongs or Aged Pu-erh (Multiple Gongfu pours)</option>
+              <option value="black">Bold Black Teas, Assam, Chai or English Breakfast</option>
+              <option value="varied">Everything — White, Green, Flowering Blooms &amp; Herbal</option>
+            </select>
+          </div>
+
+          <div class="space-y-2">
+            <label for="quiz-cups" class="eyebrow block">2. How many cups do you brew per session?</label>
+            <select
+              id="quiz-cups"
+              data-quiz-cups
+              class="w-full min-h-[44px] px-3.5 py-2 border border-border-strong rounded bg-rice text-charcoal text-sm font-medium focus:outline-none focus:border-matcha"
+            >
+              <option value="solo">Solo Tasting / Gongfu Rounds (150ml–350ml)</option>
+              <option value="couple">1–2 Big Mugs / Morning Routine (400ml–750ml)</option>
+              <option value="group">Afternoon Hosting / 3–5 Cups (800ml–1200ml)</option>
+            </select>
+          </div>
+
+          <div class="space-y-2">
+            <label for="quiz-heat" class="eyebrow block">3. What matters most during pouring?</label>
+            <select
+              id="quiz-heat"
+              data-quiz-heat
+              class="w-full min-h-[44px] px-3.5 py-2 border border-border-strong rounded bg-rice text-charcoal text-sm font-medium focus:outline-none focus:border-matcha"
+            >
+              <option value="precision">10/10 crisp drip-free spout &amp; rapid draining</option>
+              <option value="retention">Keeping tea piping hot for 30+ minutes on the table</option>
+              <option value="stovetop">Direct stovetop simmering &amp; blooming flower visibility</option>
+              <option value="cleanup">Zero seasoning — dishwasher-safe / ultra-fast rinse</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 bg-stone/55 p-6 sm:p-8 flex flex-col justify-between gap-6" aria-live="polite">
+          <div class="space-y-4">
+            <div class="space-y-1 pb-4 border-b border-border-subtle">
+              <p class="eyebrow">Recommended Vessel Match</p>
+              <h2 class="font-serif text-2xl font-semibold text-charcoal leading-snug" data-match-title>
+                Tokoname Gyokko Yokode Kyusu (320ml)
+              </h2>
+              <p class="font-mono text-xs text-terracotta-text font-semibold" data-match-meta>
+                Tokoname Kyusu Clay · Pour 10/10 · Heat 8.5/10
+              </p>
+            </div>
+
+            <p class="text-sm text-charcoal leading-relaxed" data-match-reason>
+              Iron-rich reduction-fired Tokoname clay mellows grassy catechins in steamed sencha
+              while its laser-sharp ceramic mesh gives the cleanest 10/10 pour cut-off in our lab.
+            </p>
+
+            <div class="p-3.5 rounded border border-border-subtle bg-rice text-xs space-y-1">
+              <p class="font-mono uppercase tracking-wider text-muted text-[10px]">Suggested Reading</p>
+              <a
+                href="/guides/buying-guides/japanese-kyusu-teapots-guide/"
+                data-match-guide-link
+                class="font-semibold text-matcha underline underline-offset-4 hover:text-terracotta-text"
+              >
+                <span data-match-guide-label>Authentic Japanese Kyusu Guide</span> &rarr;
+              </a>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-2.5">
+            <a
+              href="/gallery/tokoname-gyokko-yokode-kyusu/"
+              data-match-dossier-link
+              class="btn-matcha flex-1 text-sm text-center"
+            >
+              Read Full Vessel Review &rarr;
+            </a>
+            <a href="/tools/tea-ratio-calculator/" class="btn-hairline flex-1 text-sm text-center">
+              Leaf Ratio Calc
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <FaqAccordion faqs={quizFaqs} emitSchema={false} />
+    <DisclosureBanner />
+  </div>
+</BaseLayout>
+
+<script>
+  function initTeapotQuiz() {
+    const root = document.querySelector<HTMLElement>('[data-teapot-quiz]');
+    if (!root || root.dataset.bound === 'true') return;
+    root.dataset.bound = 'true';
+
+    const RESULTS = {
+      tokoname: {
+        title: 'Tokoname Gyokko Yokode Kyusu (320ml)',
+        meta: 'Tokoname Kyusu Clay · Pour 10/10 · Heat 8.5/10',
+        reason:
+          'Iron-rich unglazed Tokoname reduction clay subtly softens astringency in steamed green teas, while its ceramic sasame strainer and hollow side handle pour with 10/10 laminar perfection.',
+        dossierHref: '/gallery/tokoname-gyokko-yokode-kyusu/',
+        guideHref: '/guides/buying-guides/japanese-kyusu-teapots-guide/',
+        guideLabel: 'Read: Authentic Japanese Kyusu Guide',
+      },
+      yixing: {
+        title: 'Yixing Zhuni Shui Ping Clay Teapot (160ml)',
+        meta: 'Yixing Zisha Clay · Pour 9/10 · Heat 8.5/10',
+        reason:
+          'Dense Zhuni Zisha stoneware locks in near-boiling extraction temperatures needed to coax deep aromatics out of roasted oolongs and aged pu-erh across 8+ flash infusions.',
+        dossierHref: '/gallery/yixing-zhuni-shui-ping-clay-teapot/',
+        guideHref: '/guides/materials/how-to-tell-real-vs-fake-yixing-teapot/',
+        guideLabel: 'Read: Real vs. Fake Yixing 5 Lab Tests',
+      },
+      iwachu: {
+        title: 'Iwachu Arare Cast Iron Tetsubin (650ml)',
+        meta: 'Cast Iron · Pour 8.5/10 · Heat 9.5/10',
+        reason:
+          'Sand-cast in Morioka with an inert porcelain enamel interior, this balanced tetsubin holds black and spiced blends piping hot without imparting metallic flavors or flash rust.',
+        dossierHref: '/gallery/iwachu-arare-cast-iron-tetsubin/',
+        guideHref: '/guides/buying-guides/best-cast-iron-tetsubin-teapots/',
+        guideLabel: 'Read: Best Japanese Cast Iron Tetsubin Guide',
+      },
+      bredemeijer: {
+        title: 'Bredemeijer Duet Bella Ronde Insulated (1.2L)',
+        meta: 'Double-Wall Stainless · Pour 9/10 · Heat 10/10',
+        reason:
+          'If keeping 4 to 5 cups steaming hot for over 45 minutes with zero lid dribbles is your top priority, Bredemeijer’s insulated double-wall jacket scored a rare 10/10 for heat retention.',
+        dossierHref: '/gallery/bredemeijer-duet-bella-ronde-insulated/',
+        guideHref: '/guides/care-maintenance/why-does-my-teapot-drip/',
+        guideLabel: 'Read: Spout Pour Physics & Anti-Drip Design',
+      },
+      teabloom: {
+        title: 'Teabloom Celebration Stovetop Glass (1200ml)',
+        meta: 'Borosilicate Glass · Pour 8.5/10 · Heat 6.5/10',
+        reason:
+          'Engineered from thicker thermal-shock-resistant borosilicate glass, Teabloom excels for flowering tea blooms, loose herbal blends, and gentle low-flame stovetop simmering.',
+        dossierHref: '/gallery/teabloom-celebration-stovetop-glass/',
+        guideHref: '/guides/care-maintenance/can-you-put-glass-teapot-on-stove/',
+        guideLabel: 'Read: Using Glass Teapots on Stovetops Safely',
+      },
+      hario: {
+        title: 'Hario ChaCha Kyusu Maru (700ml)',
+        meta: 'Borosilicate Glass · Pour 9/10 · Heat 6/10',
+        reason:
+          'Our most versatile daily driver: deep removable stainless steel basket, wide dishwasher-safe glass body with zero flavor carryover between teas, and crisp 9/10 drip-free pour.',
+        dossierHref: '/gallery/hario-chacha-kyusu-maru-700/',
+        guideHref: '/guides/buying-guides/best-teapot-for-each-tea-type/',
+        guideLabel: 'Read: Best Teapot for Every Tea Type',
+      },
+      zerojapan: {
+        title: 'Zero Japan Universal Artisan Teapot (450ml)',
+        meta: 'Glazed Ceramic & Stoneware · Pour 9/10 · Heat 8/10',
+        reason:
+          'Mino-ware vitrified glaze cleans effortlessly without staining, while the hinged clip-on stainless lid never falls off mid-pour during rapid solo or 2-cup mornings.',
+        dossierHref: '/gallery/zero-japan-universal-artisan-teapot/',
+        guideHref: '/guides/materials/yixing-clay-vs-porcelain/',
+        guideLabel: 'Read: Porous Clay vs. Glazed Ceramic & Porcelain',
+      },
+    } as const;
+
+    const teaSel = root.querySelector<HTMLSelectElement>('[data-quiz-tea]');
+    const cupsSel = root.querySelector<HTMLSelectElement>('[data-quiz-cups]');
+    const heatSel = root.querySelector<HTMLSelectElement>('[data-quiz-heat]');
+
+    const titleEl = root.querySelector('[data-match-title]');
+    const metaEl = root.querySelector('[data-match-meta]');
+    const reasonEl = root.querySelector('[data-match-reason]');
+    const guideLink = root.querySelector<HTMLAnchorElement>('[data-match-guide-link]');
+    const guideLabel = root.querySelector('[data-match-guide-label]');
+    const dossierLink = root.querySelector<HTMLAnchorElement>('[data-match-dossier-link]');
+
+    const evaluate = () => {
+      const tea = teaSel?.value ?? 'green';
+      const cups = cupsSel?.value ?? 'solo';
+      const heat = heatSel?.value ?? 'precision';
+
+      let pickKey: keyof typeof RESULTS = 'hario';
+
+      if (heat === 'stovetop') {
+        pickKey = 'teabloom';
+      } else if (tea === 'oolong' && cups === 'solo') {
+        pickKey = 'yixing';
+      } else if (tea === 'green' && heat !== 'cleanup') {
+        pickKey = cups === 'group' ? 'hario' : 'tokoname';
+      } else if (heat === 'retention' && cups === 'group') {
+        pickKey = 'bredemeijer';
+      } else if (tea === 'black' && heat === 'retention') {
+        pickKey = cups === 'group' ? 'bredemeijer' : 'iwachu';
+      } else if (heat === 'cleanup' || cups === 'couple') {
+        pickKey = tea === 'varied' ? 'hario' : 'zerojapan';
+      } else if (cups === 'group') {
+        pickKey = 'bredemeijer';
+      } else if (tea === 'green') {
+        pickKey = 'tokoname';
+      }
+
+      const res = RESULTS[pickKey];
+      if (titleEl) titleEl.textContent = res.title;
+      if (metaEl) metaEl.textContent = res.meta;
+      if (reasonEl) reasonEl.textContent = res.reason;
+      if (dossierLink) dossierLink.href = res.dossierHref;
+      if (guideLink) guideLink.href = res.guideHref;
+      if (guideLabel) guideLabel.textContent = res.guideLabel;
+    };
+
+    teaSel?.addEventListener('change', evaluate);
+    cupsSel?.addEventListener('change', evaluate);
+    heatSel?.addEventListener('change', evaluate);
+    evaluate();
+  }
+
+  initTeapotQuiz();
+  document.addEventListener('astro:page-load', initTeapotQuiz);
+</script>
