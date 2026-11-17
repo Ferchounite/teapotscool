@@ -1,6 +1,5 @@
 import type { CollectionEntry } from 'astro:content';
 import {
-  AMAZON_TAG,
   CLUSTERS,
   CLUSTER_LIST,
   CLUSTER_SLUGS,
@@ -10,7 +9,6 @@ import {
 } from '../data/clusters';
 
 export {
-  AMAZON_TAG,
   CLUSTERS,
   CLUSTER_LIST,
   CLUSTER_SLUGS,

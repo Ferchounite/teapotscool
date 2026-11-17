@@ -22,10 +22,6 @@ const {
   name,
   subtitle,
   description,
-  asin,
-  affiliateUrl,
-  secondaryStoreName,
-  secondaryAffiliateUrl,
   badge,
   material,
   style,
@@ -57,17 +53,27 @@ const heatLabel = formatScore(clampedHeat);
 const clusterMeta = getClusterMeta(relatedCluster);
 const clusterHubHref = getClusterHubHref(relatedCluster);
 
+let featuredInGuides: CollectionEntry<'guides'>[] = [];
 let relatedGuides: CollectionEntry<'guides'>[] = [];
 try {
   const allGuides = await getCollection('guides');
+  const sortGuides = (a: CollectionEntry<'guides'>, b: CollectionEntry<'guides'>) => {
+    if (a.data.isPillar !== b.data.isPillar) return a.data.isPillar ? -1 : 1;
+    return b.data.updatedDate.getTime() - a.data.updatedDate.getTime();
+  };
+
+  featuredInGuides = allGuides
+    .filter((g) => g.data.affiliateProducts?.some((p) => p.teapotSlug === slug))
+    .sort(sortGuides);
+
+  const featuredSlugs = new Set(featuredInGuides.map((g) => g.slug));
+
   relatedGuides = allGuides
-    .filter((g) => g.data.cluster === relatedCluster)
-    .sort((a, b) => {
-      if (a.data.isPillar !== b.data.isPillar) return a.data.isPillar ? -1 : 1;
-      return b.data.updatedDate.getTime() - a.data.updatedDate.getTime();
-    })
+    .filter((g) => g.data.cluster === relatedCluster && !featuredSlugs.has(g.slug))
+    .sort(sortGuides)
     .slice(0, 3);
 } catch {
+  featuredInGuides = [];
   relatedGuides = [];
 }
 
@@ -77,9 +83,21 @@ const productReviewSchema: Record<string, unknown> = {
   name,
   description,
   image: [imageUrl],
-  sku: asin,
+  brand: {
+    '@type': 'Brand',
+    name: name.split(' ')[0],
+  },
+  category: style,
   material,
   url: pageUrl,
+  additionalProperty: [
+    { '@type': 'PropertyValue', name: 'Material', value: material },
+    { '@type': 'PropertyValue', name: 'Capacity', value: capacityLabel },
+    { '@type': 'PropertyValue', name: 'Pour Precision Score', value: `${pourLabel}/10` },
+    { '@type': 'PropertyValue', name: 'Heat Retention Score', value: `${heatLabel}/10` },
+    { '@type': 'PropertyValue', name: 'Infuser Style', value: infuserType },
+    { '@type': 'PropertyValue', name: 'Stovetop Safe', value: stovetopSafe },
+  ],
   review: {
     '@type': 'Review',
     name: `${name} — Studio Pour & Thermal Review`,
@@ -236,31 +254,18 @@ const breadcrumbSchema: Record<string, unknown> = {
           </div>
         </dl>
 
-        <!-- Affiliate CTAs -->
+        <!-- Studio CTAs -->
         <div class="pt-2 space-y-2.5">
           <div class="flex flex-wrap items-center gap-3">
-            <a
-              href={affiliateUrl}
-              target="_blank"
-              rel="nofollow sponsored noopener"
-              class="btn-matcha"
-              data-asin={asin}
-            >
-              Check Current Price on Amazon
+            <a href="/tools/tea-steeping-timer/" class="btn-matcha">
+              Launch Interactive Steep Timer &rarr;
             </a>
-            {secondaryAffiliateUrl && secondaryStoreName && (
-              <a
-                href={secondaryAffiliateUrl}
-                target="_blank"
-                rel="nofollow sponsored noopener"
-                class="btn-hairline"
-              >
-                View on {secondaryStoreName}
-              </a>
-            )}
+            <a href={clusterHubHref} class="btn-hairline">
+              Explore {clusterMeta.shortTitle} Hub &rarr;
+            </a>
           </div>
           <p class="text-xs text-muted">
-            Price &amp; availability are dynamic and subject to change on retailer listings.
+            Bench-verified for spout cut-off precision and 30-minute thermal stability.
           </p>
         </div>
       </div>
@@ -322,14 +327,97 @@ const breadcrumbSchema: Record<string, unknown> = {
       </div>
     </section>
 
-    <!-- Related Guides from Cluster -->
+    <!-- Featured In Our Lab Guides & Benchmarks (Bidirectional PageRank Graph) -->
+    {featuredInGuides.length > 0 && (
+      <section aria-labelledby="featured-guides-heading" class="pt-10 border-t border-border-subtle space-y-6">
+        <div class="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p class="eyebrow">
+              Lab Citations &middot; {featuredInGuides.length}{' '}
+              {featuredInGuides.length === 1 ? 'Guide' : 'Guides'}
+            </p>
+            <h2 id="featured-guides-heading" class="font-serif text-2xl sm:text-3xl font-semibold text-charcoal mt-1">
+              Featured In Our Lab Guides &amp; Benchmarks
+            </h2>
+          </div>
+          <a
+            href="/guides/"
+            class="inline-flex items-center min-h-[44px] text-sm font-semibold text-matcha underline underline-offset-4 hover:text-terracotta-text"
+          >
+            Browse all lab guides &rarr;
+          </a>
+        </div>
+
+        <div
+          class:list={[
+            'grid grid-cols-1 gap-6',
+            featuredInGuides.length === 2 || featuredInGuides.length === 4
+              ? 'md:grid-cols-2'
+              : 'md:grid-cols-2 lg:grid-cols-3',
+          ]}
+        >
+          {featuredInGuides.map((guide) => {
+            const guideClusterMeta = getClusterMeta(guide.data.cluster);
+            const citedEntry = guide.data.affiliateProducts?.find((p) => p.teapotSlug === slug);
+            return (
+              <article class="border border-border-subtle border-l-4 border-l-matcha bg-rice rounded-md overflow-hidden flex flex-col">
+                <a href={getGuideUrl(guide)} class="block border-b border-border-subtle">
+                  <img
+                    src={guide.data.featuredImage}
+                    alt={guide.data.featuredImageAlt}
+                    width="640"
+                    height="360"
+                    loading="lazy"
+                    decoding="async"
+                    class="w-full aspect-[16/9] object-cover"
+                  />
+                </a>
+                <div class="p-5 flex-1 flex flex-col justify-between gap-3">
+                  <div class="space-y-2">
+                    <div class="flex flex-wrap items-center justify-between gap-2 font-mono text-[11px]">
+                      <span class="uppercase tracking-wider text-terracotta-text font-semibold">
+                        {guideClusterMeta.shortTitle}
+                      </span>
+                      <span class="text-muted tabular-nums">
+                        {estimateReadingTime(guide.body, guide.data.readingTime)}
+                      </span>
+                    </div>
+                    {citedEntry?.badge && (
+                      <p class="font-mono text-[11px] font-semibold text-matcha">
+                        Bench Role: {citedEntry.badge}
+                      </p>
+                    )}
+                    <h3 class="font-serif text-lg font-semibold text-charcoal leading-snug">
+                      <a href={getGuideUrl(guide)} class="hover:text-matcha">
+                        {guide.data.title}
+                      </a>
+                    </h3>
+                    <p class="text-sm text-muted line-clamp-2">{guide.data.description}</p>
+                  </div>
+                  <a
+                    href={getGuideUrl(guide)}
+                    class="inline-flex items-center min-h-[44px] text-sm font-semibold text-matcha underline underline-offset-4 hover:text-terracotta-text"
+                  >
+                    Read {guide.data.isPillar ? 'Pillar Guide' : guideClusterMeta.shortTitle} benchmark &rarr;
+                  </a>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+    )}
+
+    <!-- Remaining Related Guides from Cluster (excluding featuredInGuides to avoid duplicates) -->
     {relatedGuides.length > 0 && (
       <section aria-labelledby="teapot-guides-heading" class="pt-10 border-t border-border-subtle space-y-6">
         <div class="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p class="eyebrow">{clusterMeta.accentLabel}</p>
             <h2 id="teapot-guides-heading" class="font-serif text-2xl sm:text-3xl font-semibold text-charcoal mt-1">
-              Care &amp; Brewing Guides for This Vessel
+              {featuredInGuides.length > 0
+                ? `More ${clusterMeta.shortTitle} Guides`
+                : 'Care & Brewing Guides for This Vessel'}
             </h2>
           </div>
           <a
@@ -340,41 +428,50 @@ const breadcrumbSchema: Record<string, unknown> = {
           </a>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {relatedGuides.map((guide) => (
-            <article class="border border-border-subtle bg-rice rounded-md overflow-hidden flex flex-col">
-              <a href={getGuideUrl(guide)} class="block border-b border-border-subtle">
-                <img
-                  src={guide.data.featuredImage}
-                  alt={guide.data.featuredImageAlt}
-                  width="640"
-                  height="360"
-                  loading="lazy"
-                  decoding="async"
-                  class="w-full aspect-[16/9] object-cover"
-                />
-              </a>
-              <div class="p-5 flex-1 flex flex-col justify-between gap-3">
-                <div class="space-y-1.5">
-                  <p class="font-mono text-[11px] uppercase tracking-wider text-terracotta-text font-semibold">
-                    {estimateReadingTime(guide.body, guide.data.readingTime)}
-                  </p>
-                  <h3 class="font-serif text-lg font-semibold text-charcoal leading-snug">
-                    <a href={getGuideUrl(guide)} class="hover:text-matcha">
-                      {guide.data.title}
-                    </a>
-                  </h3>
-                  <p class="text-sm text-muted line-clamp-2">{guide.data.description}</p>
-                </div>
-                <a
-                  href={getGuideUrl(guide)}
-                  class="inline-flex items-center min-h-[44px] text-sm font-semibold text-matcha underline underline-offset-4 hover:text-terracotta-text"
-                >
-                  Read guide &rarr;
+        <div
+          class:list={[
+            'grid grid-cols-1 gap-6',
+            relatedGuides.length === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3',
+          ]}
+        >
+          {relatedGuides.map((guide) => {
+            const guideClusterMeta = getClusterMeta(guide.data.cluster);
+            return (
+              <article class="border border-border-subtle bg-rice rounded-md overflow-hidden flex flex-col">
+                <a href={getGuideUrl(guide)} class="block border-b border-border-subtle">
+                  <img
+                    src={guide.data.featuredImage}
+                    alt={guide.data.featuredImageAlt}
+                    width="640"
+                    height="360"
+                    loading="lazy"
+                    decoding="async"
+                    class="w-full aspect-[16/9] object-cover"
+                  />
                 </a>
-              </div>
-            </article>
-          ))}
+                <div class="p-5 flex-1 flex flex-col justify-between gap-3">
+                  <div class="space-y-1.5">
+                    <p class="font-mono text-[11px] uppercase tracking-wider text-terracotta-text font-semibold">
+                      {guide.data.isPillar ? 'Pillar Guide' : guideClusterMeta.shortTitle} ·{' '}
+                      {estimateReadingTime(guide.body, guide.data.readingTime)}
+                    </p>
+                    <h3 class="font-serif text-lg font-semibold text-charcoal leading-snug">
+                      <a href={getGuideUrl(guide)} class="hover:text-matcha">
+                        {guide.data.title}
+                      </a>
+                    </h3>
+                    <p class="text-sm text-muted line-clamp-2">{guide.data.description}</p>
+                  </div>
+                  <a
+                    href={getGuideUrl(guide)}
+                    class="inline-flex items-center min-h-[44px] text-sm font-semibold text-matcha underline underline-offset-4 hover:text-terracotta-text"
+                  >
+                    Read {guideClusterMeta.shortTitle} guide &rarr;
+                  </a>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </section>
     )}

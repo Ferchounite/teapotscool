@@ -11,13 +11,13 @@ const webPageSchema: Record<string, unknown> = {
   name: 'Privacy Policy — GDPR & CCPA | TeapotsCool',
   url: pageUrl,
   description:
-    'Privacy Policy for TeapotsCool.com covering cookies, analytics, affiliate outbound links, display advertising, and GDPR/CCPA user rights.',
+    'Privacy Policy for TeapotsCool.com covering edge logs, privacy-preserving analytics, local browser state, and GDPR/CCPA user rights.',
 };
 ---
 
 <BaseLayout
   title="Privacy Policy (GDPR & CCPA) | TeapotsCool"
-  description="Learn how TeapotsCool.com handles minimal browser data, affiliate outbound links, cookies, display ad networks, and your GDPR/CCPA privacy rights."
+  description="Learn how TeapotsCool.com handles minimal browser data, anonymized Google Analytics telemetry, local steep-timer state, and your GDPR/CCPA privacy rights."
   canonicalPath={pagePath}
   schemas={[webPageSchema]}
 >
@@ -45,10 +45,10 @@ const webPageSchema: Record<string, unknown> = {
     <div class="prose prose-tea max-w-[68ch]">
       <h2>1. Overview &amp; Minimal Data Footprint</h2>
       <p>
-        <strong>TeapotsCool.com</strong> is a static editorial publication. We do not require user
-        accounts, logins, or newsletter sign-ups to browse our teapot gallery, read our guides, or
-        use our <a href="/tools/tea-steeping-timer/">Interactive Tea Steeping Timer</a> (which
-        runs entirely inside your browser without transmitting timer state to any server).
+        <strong>TeapotsCool.com</strong> is a non-commercial, static editorial publication. We do not
+        require user accounts, logins, or newsletter sign-ups to browse our teapot gallery, read our
+        guides, or use our <a href="/tools/tea-steeping-timer/">Interactive Tea Steeping Timer</a>{' '}
+        (which runs entirely inside your browser without transmitting timer state to any server).
       </p>
 
       <h2>2. Server Logs &amp; Edge Hosting</h2>
@@ -58,52 +58,29 @@ const webPageSchema: Record<string, unknown> = {
         paths strictly for DDoS mitigation, security diagnostics, and reliable page delivery.
       </p>
 
-      <h2>3. Cookies, Analytics &amp; Advertising Partners</h2>
+      <h2>3. Privacy-Preserving Analytics</h2>
       <p>
-        Depending on your region and browser consent preferences, TeapotsCool may utilize:
+        We use Google Analytics 4 with IP anonymization enabled solely to measure aggregate organic
+        readership and understand which teapot care, materials, and brewing guides help visitors
+        most. TeapotsCool currently runs without display advertising networks or affiliate tracking
+        scripts. You can opt out of analytics at any time using your browser privacy controls or the
+        official Google Analytics Opt-out Browser Add-on.
       </p>
-      <ul>
-        <li>
-          <strong>Privacy-Preserving Analytics:</strong> Aggregate page-view and Core Web Vitals
-          telemetry to understand which brewing and teapot care guides help readers most.
-        </li>
-        <li>
-          <strong>Display Advertising (Google AdSense / Journey by Mediavine):</strong> Third-party
-          vendors may use cookies or local identifiers to serve contextual or consented
-          advertisements in dedicated ad slots. You can manage personalized advertising settings via
-          your browser preferences or Google Ad Settings.
-        </li>
-        <li>
-          <strong>Affiliate Outbound Links:</strong> Clicking an outbound merchant link (such as
-          Amazon Associates) sets a referral cookie on the destination retailer’s domain in
-          accordance with that retailer’s privacy policy so qualifying purchases are credited to
-          TeapotsCool.
-        </li>
-      </ul>
 
       <h2>4. Your Rights Under GDPR (EEA/UK) &amp; CCPA/CPRA (California)</h2>
       <p>
         If you reside in the European Economic Area, the United Kingdom, or California, you have
         the right to request access to personal data (if any is held), request deletion or
-        correction, opt out of personalized ad cookies, and withdraw consent at any time via your
-        browser privacy controls or consent banner settings. TeapotsCool does not sell personal
-        information for monetary consideration.
+        correction, opt out of analytics telemetry, and manage cookie preferences via your browser
+        settings. TeapotsCool does not sell personal information for monetary consideration.
       </p>
 
-      <h2>5. External Websites</h2>
+      <h2>5. Editorial Independence &amp; Policy Updates</h2>
       <p>
-        Our articles and curated gallery link to external marketplaces and ceramic studios. We do
-        not control the privacy practices or content of third-party websites; please review their
-        privacy policies before submitting personal or payment details on their platforms.
-      </p>
-
-      <h2>6. Policy Updates &amp; Contact</h2>
-      <p>
-        We may update this Privacy Policy periodically as advertising partners or analytics tools
-        evolve. Any revisions take effect upon publication on this page with an updated effective
-        date. Review our companion{' '}
-        <a href="/affiliate-disclosure/">Affiliate Disclosure</a> for full transparency regarding
-        monetization.
+        We may update this Privacy Policy periodically as site tools evolve. Any revisions take
+        effect upon publication on this page with an updated effective date. Read more about our
+        independent bench testing standards on the <a href="/about/">About &amp; Testing Lab</a>{' '}
+        page.
       </p>
     </div>
   </article>

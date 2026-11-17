@@ -31,6 +31,10 @@ const {
   noindex = false,
 } = Astro.props;
 
+const gaMeasurementId = import.meta.env.PUBLIC_GA4_MEASUREMENT_ID || 'G-TGG7V0BF1M';
+const gscVerificationToken =
+  import.meta.env.GSC_VERIFICATION_TOKEN || 'hk04PCc7wcBwMy7xa5uo7_pazFW1rb7Vr5mDiHlEnA4';
+
 const resolvedPath = canonicalPath ?? Astro.url.pathname;
 const canonicalUrl = new URL(resolvedPath, SITE_URL).toString();
 const resolvedOgImage = ogImage.startsWith('http') ? ogImage : new URL(ogImage, SITE_URL).toString();
@@ -60,6 +64,30 @@ const isCurrent = (href: string) =>
     {noindex && <meta name="robots" content="noindex, follow" />}
     <meta name="theme-color" content="#FAF8F5" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {gscVerificationToken && <meta name="google-site-verification" content={gscVerificationToken} />}
+
+    {
+      gaMeasurementId && (
+        <>
+          <script
+            is:inline
+            async
+            src={`https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}`}
+          />
+          <script
+            is:inline
+            define:vars={{ gaMeasurementId }}
+          >
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+              dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+            gtag('config', gaMeasurementId, { anonymize_ip: true });
+          </script>
+        </>
+      )
+    }
 
     <!-- Google Fonts: Fraunces, Plus Jakarta Sans & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -288,11 +316,11 @@ const isCurrent = (href: string) =>
 
           <!-- Transparency & Legal -->
           <div class="lg:pl-8">
-            <p class="eyebrow mb-3">Transparency</p>
+            <p class="eyebrow mb-3">Standards &amp; Legal</p>
             <ul class="space-y-0.5 text-sm">
               <li>
-                <a href="/affiliate-disclosure/" class="inline-flex items-center min-h-[44px] text-charcoal hover:text-matcha">
-                  Affiliate Disclosure
+                <a href="/about/" class="inline-flex items-center min-h-[44px] text-charcoal hover:text-matcha">
+                  Editorial Standards
                 </a>
               </li>
               <li>
@@ -311,10 +339,9 @@ const isCurrent = (href: string) =>
 
         <div class="pt-6 border-t border-border-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs text-muted leading-relaxed">
           <p class="max-w-2xl">
-            <strong class="font-semibold text-charcoal">Amazon Associates Notice:</strong>
-            As an Amazon Associate (<code>tag=teapotscool-20</code>), TeapotsCool earns from
-            qualifying purchases. Product prices and availability are accurate as of the date/time
-            indicated on Amazon and are subject to change without notice.
+            <strong class="font-semibold text-charcoal">Editorial Independence Pledge:</strong>
+            TeapotsCool is an independent, non-commercial tea vessel research archive. We accept zero
+            paid placements, zero sponsored rankings, and use zero affiliate commissions.
           </p>
           <p class="font-mono shrink-0">
             &copy; {new Date().getFullYear()} TeapotsCool.com

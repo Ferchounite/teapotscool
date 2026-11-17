@@ -4,8 +4,8 @@ import { getTeapotLeafSlug, formatScore } from '../lib/clusterUi';
 
 export interface Props {
   name: string;
-  asin: string;
-  affiliateUrl: string;
+  asin?: string;
+  affiliateUrl?: string;
   badge: string;
   material: string;
   capacity: string;
@@ -19,14 +19,10 @@ export interface Props {
   variant?: 'full' | 'quick-verdict' | 'compact';
   image?: string;
   imageAlt?: string;
-  secondaryStoreName?: string;
-  secondaryAffiliateUrl?: string;
 }
 
 const {
   name,
-  asin,
-  affiliateUrl,
   badge,
   material,
   capacity,
@@ -40,12 +36,8 @@ const {
   variant = 'full',
   image: explicitImage,
   imageAlt: explicitImageAlt,
-  secondaryStoreName: explicitSecondaryName,
-  secondaryAffiliateUrl: explicitSecondaryUrl,
 } = Astro.props;
 
-let resolvedAsin = asin;
-let resolvedAffiliateUrl = affiliateUrl;
 let resolvedMaterial = material;
 let resolvedCapacity = capacity;
 let resolvedPourScore = pourScore;
@@ -53,16 +45,12 @@ let resolvedHeatScore = heatScore;
 let resolvedPriceTier = priceTier;
 let resolvedImage = explicitImage;
 let resolvedImageAlt = explicitImageAlt ?? `${name} curated teapot preview`;
-let resolvedSecondaryName = explicitSecondaryName;
-let resolvedSecondaryUrl = explicitSecondaryUrl;
 
 if (teapotSlug) {
   try {
     const teapots = await getCollection('teapots');
     const matched = teapots.find((t) => getTeapotLeafSlug(t) === teapotSlug);
     if (matched) {
-      resolvedAsin = matched.data.asin;
-      resolvedAffiliateUrl = matched.data.affiliateUrl;
       resolvedMaterial = matched.data.material;
       resolvedCapacity = matched.data.capacityLabel;
       resolvedPourScore = matched.data.pourScore;
@@ -71,10 +59,6 @@ if (teapotSlug) {
       if (!resolvedImage) {
         resolvedImage = matched.data.image;
         resolvedImageAlt = matched.data.imageAlt;
-      }
-      if (!resolvedSecondaryUrl && matched.data.secondaryAffiliateUrl) {
-        resolvedSecondaryUrl = matched.data.secondaryAffiliateUrl;
-        resolvedSecondaryName = matched.data.secondaryStoreName ?? 'Specialty Store';
       }
     }
   } catch {
@@ -186,22 +170,14 @@ const galleryHref = teapotSlug ? `/gallery/${teapotSlug}/` : undefined;
         </div>
 
         <div class="flex flex-col gap-2.5 md:w-60 md:border-l md:border-border-subtle md:pl-6">
-          <a
-            href={resolvedAffiliateUrl}
-            target="_blank"
-            rel="nofollow sponsored noopener"
-            class="btn-matcha w-full text-center"
-            data-asin={resolvedAsin}
-          >
-            Check Price on Amazon
+          <a href={galleryHref ?? '/gallery/'} class="btn-matcha w-full text-center">
+            Read Studio Review &rarr;
           </a>
-          {galleryHref && (
-            <a href={galleryHref} class="btn-hairline w-full text-center">
-              View Vessel Dossier
-            </a>
-          )}
+          <a href="#tested-picks-heading" class="btn-hairline w-full text-center">
+            Compare All Tested Picks &darr;
+          </a>
           <p class="text-[11px] leading-snug text-muted">
-            Dynamic pricing &amp; stock verified directly on Amazon.
+            Bench-verified for spout cut-off precision and 30-minute thermal stability.
           </p>
         </div>
       </div>
@@ -241,23 +217,9 @@ const galleryHref = teapotSlug ? `/gallery/${teapotSlug}/` : undefined;
         </div>
 
         <div class="flex flex-col sm:items-end gap-2 shrink-0">
-          <a
-            href={resolvedAffiliateUrl}
-            target="_blank"
-            rel="nofollow sponsored noopener"
-            class="btn-matcha w-full sm:w-auto text-sm"
-            data-asin={resolvedAsin}
-          >
-            Check Price on Amazon
+          <a href={galleryHref ?? '/gallery/'} class="btn-matcha w-full sm:w-auto text-sm">
+            Read Studio Review &rarr;
           </a>
-          {galleryHref && (
-            <a
-              href={galleryHref}
-              class="inline-flex items-center min-h-[44px] px-2 text-xs font-semibold text-matcha underline underline-offset-4 hover:text-terracotta-text"
-            >
-              Read full vessel review
-            </a>
-          )}
         </div>
       </div>
     </aside>
@@ -367,36 +329,15 @@ const galleryHref = teapotSlug ? `/gallery/${teapotSlug}/` : undefined;
 
       <footer class="pt-5 border-t border-border-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div class="flex flex-wrap items-center gap-2.5">
-          <a
-            href={resolvedAffiliateUrl}
-            target="_blank"
-            rel="nofollow sponsored noopener"
-            class="btn-matcha"
-            data-asin={resolvedAsin}
-          >
-            Check Price on Amazon
+          <a href={galleryHref ?? '/gallery/'} class="btn-matcha">
+            Read Full Studio Review &rarr;
           </a>
-          {resolvedSecondaryUrl && resolvedSecondaryName && (
-            <a
-              href={resolvedSecondaryUrl}
-              target="_blank"
-              rel="nofollow sponsored noopener"
-              class="btn-hairline"
-            >
-              Visit {resolvedSecondaryName}
-            </a>
-          )}
-          {galleryHref && (
-            <a
-              href={galleryHref}
-              class="inline-flex items-center min-h-[44px] px-3 text-sm font-semibold text-charcoal underline underline-offset-4 hover:text-matcha"
-            >
-              Full vessel review &rarr;
-            </a>
-          )}
+          <a href="/tools/tea-steeping-timer/" class="btn-hairline">
+            Steep Timer &rarr;
+          </a>
         </div>
         <p class="text-[11px] text-muted">
-          Availability &amp; pricing fluctuate live on Amazon.
+          Independent bench scores verified by Clara Vance Lab.
         </p>
       </footer>
     </article>

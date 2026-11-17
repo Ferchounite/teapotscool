@@ -7,11 +7,17 @@ import {
   CLUSTER_LIST,
   getClusterHubHref,
   getGuideUrl,
+  getTeapotUrl,
   estimateReadingTime,
   formatIsoDate,
+  formatScore,
 } from '../../lib/clusterUi';
 
 const allGuides = await getCollection('guides');
+const allTeapots = (await getCollection('teapots')).sort((a, b) => {
+  if (a.data.featured !== b.data.featured) return a.data.featured ? -1 : 1;
+  return b.data.pourScore - a.data.pourScore;
+});
 
 const collectionSchema: Record<string, unknown> = {
   '@context': 'https://schema.org',
@@ -186,5 +192,53 @@ const breadcrumbSchema: Record<string, unknown> = {
         </section>
       );
     })}
+
+    <!-- Complete Crawl-Depth-1 Vessel Dossiers & Steep Utility Cross-Links -->
+    <section aria-labelledby="vessel-dossiers-heading" class="pt-4 space-y-6">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div class="space-y-1.5 max-w-2xl">
+          <p class="eyebrow">Studio Benchmark Archive</p>
+          <h2 id="vessel-dossiers-heading" class="font-serif text-2xl sm:text-3xl font-semibold text-charcoal">
+            Curated Lab Vessel Dossiers
+          </h2>
+          <p class="text-sm sm:text-base text-muted leading-relaxed">
+            Jump directly to all {allTeapots.length} lab-tested vessel dossiers for pour metrics,
+            thermal curves, and strainer specs—or calibrate your steep with our vessel-aware timer.
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <a href="/gallery/" class="btn-hairline text-sm">
+            Filter Curated Gallery &rarr;
+          </a>
+          <a href="/tools/tea-steeping-timer/" class="btn-matcha text-sm">
+            Interactive Steep Timer &rarr;
+          </a>
+        </div>
+      </div>
+
+      <div class="hairline-grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 rounded-md overflow-hidden">
+        {allTeapots.map((teapot) => (
+          <article class="min-w-0 p-4 flex flex-col justify-between gap-3 hover:bg-stone/35 transition-colors">
+            <div class="space-y-1.5">
+              <p class="font-mono text-[10px] uppercase tracking-wider text-terracotta-text font-semibold">
+                {teapot.data.material}
+              </p>
+              <h3 class="font-serif text-base font-semibold text-charcoal leading-snug">
+                <a
+                  href={getTeapotUrl(teapot)}
+                  class="inline-flex items-center min-h-[44px] py-1 hover:text-matcha underline decoration-border-strong underline-offset-4 hover:decoration-matcha transition-colors"
+                >
+                  {teapot.data.name}
+                </a>
+              </h3>
+            </div>
+            <p class="pt-2 border-t border-border-subtle font-mono text-[11px] text-muted tabular-nums">
+              Pour {formatScore(teapot.data.pourScore)}/10 &middot; Heat{' '}
+              {formatScore(teapot.data.heatScore)}/10
+            </p>
+          </article>
+        ))}
+      </div>
+    </section>
   </div>
 </BaseLayout>

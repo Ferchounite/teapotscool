@@ -1,5 +1,3 @@
-export const AMAZON_TAG = 'teapotscool-20' as const;
-
 export const CLUSTER_SLUGS = [
   'buying-guides',
   'care-maintenance',
@@ -98,15 +96,4 @@ export function getClusterMeta(slug: string): ClusterMeta | undefined {
   return Object.prototype.hasOwnProperty.call(CLUSTERS, slug)
     ? CLUSTERS[slug as ClusterSlug]
     : undefined;
-}
-
-/**
- * Build a compliant Amazon Associates product URL using the site tag.
- */
-export function buildAmazonUrl(asin: string): string {
-  const cleanAsin = asin.trim();
-  if (!/^[A-Za-z0-9-]+$/.test(cleanAsin)) {
-    throw new Error(`Invalid Amazon ASIN provided to buildAmazonUrl: "${asin}"`);
-  }
-  return `https://www.amazon.com/dp/${cleanAsin}?tag=${AMAZON_TAG}`;
 }

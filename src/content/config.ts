@@ -18,8 +18,8 @@ const guidesCollection = defineCollection({
       .array(
         z.object({
           name: z.string(),
-          asin: z.string(),
-          affiliateUrl: z.string().url(),
+          asin: z.string().optional(),
+          affiliateUrl: z.string().url().optional(),
           badge: z.string(),
           material: z.string(),
           capacity: z.string(),
@@ -50,8 +50,8 @@ const teapotsCollection = defineCollection({
     name: z.string(),
     subtitle: z.string(),
     description: z.string(),
-    asin: z.string(),
-    affiliateUrl: z.string().url(),
+    asin: z.string().optional(),
+    affiliateUrl: z.string().url().optional(),
     secondaryStoreName: z.string().optional(),
     secondaryAffiliateUrl: z.string().url().optional(),
     badge: z.string(),

@@ -47,8 +47,6 @@ const affiliateProducts = (rawAffiliateProducts ?? []).map((product) => {
   if (!canonical) return product;
   return {
     ...product,
-    asin: canonical.asin,
-    affiliateUrl: canonical.affiliateUrl,
     material: canonical.material,
     capacity: canonical.capacityLabel,
     pourScore: canonical.pourScore,
@@ -66,6 +64,7 @@ const imageUrl = featuredImage.startsWith('http')
   ? featuredImage
   : new URL(featuredImage, SITE_URL).toString();
 const calculatedReadingTime = estimateReadingTime(entry.body, readingTime);
+const wordCount = entry.body ? entry.body.trim().split(/\s+/).filter(Boolean).length : 0;
 
 // 1. Article JSON-LD
 const articleSchema: Record<string, unknown> = {
@@ -76,10 +75,22 @@ const articleSchema: Record<string, unknown> = {
   image: [imageUrl],
   datePublished: pubDate.toISOString(),
   dateModified: updatedDate.toISOString(),
+  wordCount,
+  articleSection: clusterMeta.title,
+  inLanguage: 'en-US',
+  keywords: entry.data.primaryKeyword ?? clusterMeta.dataForSeoTopKeywords.slice(0, 5).join(', '),
   author: {
     '@type': 'Person',
     name: author || EDITORIAL_AUTHOR.name,
     url: EDITORIAL_AUTHOR.url,
+    jobTitle: 'Tea Vessel Researcher & Ceramicist',
+    knowsAbout: [
+      'Teapots',
+      'Japanese Kyusu',
+      'Cast Iron Tetsubin',
+      'Borosilicate Glass Teaware',
+      'Gongfu Tea Brewing',
+    ],
   },
   publisher: {
     '@type': 'Organization',
@@ -160,11 +171,10 @@ if (affiliateProducts && affiliateProducts.length > 0) {
       item: {
         '@type': 'Product',
         name: product.name,
-        sku: product.asin,
         material: product.material,
         url: product.teapotSlug
           ? `${SITE_URL}/gallery/${product.teapotSlug}/`
-          : product.affiliateUrl,
+          : guideUrl,
         review: {
           '@type': 'Review',
           author: {
@@ -306,8 +316,6 @@ const topPick = affiliateProducts?.[0];
         {topPick && (
           <AffiliateProductCard
             name={topPick.name}
-            asin={topPick.asin}
-            affiliateUrl={topPick.affiliateUrl}
             badge={topPick.badge}
             material={topPick.material}
             capacity={topPick.capacity}
@@ -339,8 +347,6 @@ const topPick = affiliateProducts?.[0];
               {affiliateProducts.map((product) => (
                 <AffiliateProductCard
                   name={product.name}
-                  asin={product.asin}
-                  affiliateUrl={product.affiliateUrl}
                   badge={product.badge}
                   material={product.material}
                   capacity={product.capacity}
@@ -376,17 +382,6 @@ const topPick = affiliateProducts?.[0];
         />
         <div class="border-t border-border-subtle pt-6">
           <BrewingTimerWidget compact={true} />
-        </div>
-        <div
-          class="ad-slot min-h-[250px] border-t border-border-subtle pt-6 flex items-center justify-center"
-          data-ad-slot="sidebar-sticky"
-          aria-label="Advertisement slot"
-        >
-          <div class="w-full min-h-[250px] border border-border-subtle bg-stone/40 rounded-md flex items-center justify-center p-4 text-center">
-            <span class="font-mono text-[11px] text-muted uppercase tracking-wider">
-              Editorial Ad Slot · 300&times;250
-            </span>
-          </div>
         </div>
       </aside>
     </div>

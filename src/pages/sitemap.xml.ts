@@ -23,7 +23,6 @@ const STATIC_ROUTES: readonly StaticRouteConfig[] = [
   { path: '/guides/materials/', changefreq: 'weekly', priority: '0.8' },
   { path: '/tools/tea-steeping-timer/', changefreq: 'monthly', priority: '0.8' },
   { path: '/about/', changefreq: 'monthly', priority: '0.5' },
-  { path: '/affiliate-disclosure/', changefreq: 'yearly', priority: '0.3' },
   { path: '/privacy-policy/', changefreq: 'yearly', priority: '0.3' },
 ];
 

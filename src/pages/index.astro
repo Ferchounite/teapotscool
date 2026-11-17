@@ -203,17 +203,8 @@ const featuredItemListSchema: Record<string, unknown> = {
             </div>
 
             <div class="flex flex-wrap items-center gap-3">
-              <a href={getTeapotUrl(spotlightTeapot)} class="btn-hairline flex-1 text-sm">
-                Full Dossier
-              </a>
-              <a
-                href={spotlightTeapot.data.affiliateUrl}
-                target="_blank"
-                rel="nofollow sponsored noopener"
-                class="btn-matcha flex-1 text-sm"
-                data-asin={spotlightTeapot.data.asin}
-              >
-                Check Price on Amazon
+              <a href={getTeapotUrl(spotlightTeapot)} class="btn-matcha w-full text-sm">
+                Read Full Studio Review &rarr;
               </a>
             </div>
           </div>
@@ -288,17 +279,8 @@ const featuredItemListSchema: Record<string, unknown> = {
                   </div>
 
                   <div class="flex flex-wrap items-center gap-2.5">
-                    <a href={href} class="btn-hairline flex-1 text-sm">
-                      Inspect Specs
-                    </a>
-                    <a
-                      href={teapot.data.affiliateUrl}
-                      target="_blank"
-                      rel="nofollow sponsored noopener"
-                      class="btn-matcha flex-1 text-sm"
-                      data-asin={teapot.data.asin}
-                    >
-                      Amazon Price
+                    <a href={href} class="btn-matcha w-full text-sm">
+                      Read Studio Review &rarr;
                     </a>
                   </div>
                 </div>
@@ -464,13 +446,12 @@ const featuredItemListSchema: Record<string, unknown> = {
         </h2>
         <p class="text-sm sm:text-base text-muted leading-relaxed">
           Every teapot in our gallery is evaluated on spout shear physics, strainer clearance, and
-          30-minute thermal loss. Learn how we test and how affiliate commissions keep TeapotsCool
-          independent.
+          30-minute thermal loss—published 100% independently with zero sponsored placements.
         </p>
       </div>
       <div class="flex flex-wrap gap-3 shrink-0">
-        <a href="/about/" class="btn-hairline">Our Testing Methodology</a>
-        <a href="/affiliate-disclosure/" class="btn-matcha">Transparency Pledge</a>
+        <a href="/about/" class="btn-matcha">Our Testing Methodology</a>
+        <a href="/gallery/" class="btn-hairline">Browse Curated Archive</a>
       </div>
     </aside>
   </section>
