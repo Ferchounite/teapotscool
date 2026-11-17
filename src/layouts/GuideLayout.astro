@@ -149,7 +149,7 @@ const GUIDE_SEO_META: Record<string, { title: string; description?: string }> = 
   'why-green-tea-tastes-bitter-teapot-temp': {
     title: 'Why Green Tea Tastes Bitter (Thermal Fix) | TeapotsCool',
     description:
-      'Discover why high water temperature and thick heat-retaining teapots make green tea bitter—and how kyusu clay or glass vessels unlock sweet umami.',
+      'Discover why high water temperature and thick heat-retaining teapots make green tea bitter—and how kyusu clay or glass vessels draw out sweet umami.',
   },
   'how-to-tell-real-vs-fake-yixing-teapot': {
     title: 'Real vs. Fake Yixing Teapot: 5 Lab Tests | TeapotsCool',
@@ -178,6 +178,7 @@ const articleSchema: Record<string, unknown> = {
   wordCount,
   articleSection: clusterMeta.title,
   inLanguage: 'en-US',
+  isAccessibleForFree: true,
   keywords: entry.data.primaryKeyword ?? clusterMeta.dataForSeoTopKeywords.slice(0, 5).join(', '),
   author: {
     '@type': 'Person',
@@ -196,6 +197,8 @@ const articleSchema: Record<string, unknown> = {
     '@type': 'Organization',
     name: 'TeapotsCool',
     url: SITE_URL,
+    publishingPrinciples: `${SITE_URL}/about/#methodology-heading`,
+    ethicsPolicy: `${SITE_URL}/about/#independence-heading`,
     logo: {
       '@type': 'ImageObject',
       url: `${SITE_URL}/images/brand/logo-mark.svg`,
@@ -384,6 +387,9 @@ const topPick = affiliateProducts?.[0];
             Updated <time datetime={updatedDate.toISOString()}>{formatIsoDate(updatedDate)}</time>
           </span>
           <span class="tabular-nums">{calculatedReadingTime}</span>
+          <a href="/about/#methodology-heading" class="hover:text-matcha underline underline-offset-4">
+            Bench Protocol v2.4
+          </a>
         </div>
       </div>
 

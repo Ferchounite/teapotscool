@@ -22,6 +22,7 @@ const aboutSchema: Record<string, unknown> = {
       '@type': 'Organization',
       name: 'TeapotsCool',
       url: SITE_URL,
+      publishingPrinciples: `${SITE_URL}/about/#methodology-heading`,
     },
   },
 };
@@ -90,7 +91,7 @@ const breadcrumbSchema: Record<string, unknown> = {
 
       <aside aria-label="Editorial independence" class="lg:col-span-5 border border-border-subtle bg-stone/60 rounded-md p-6 space-y-4">
         <p class="eyebrow">Editorial Independence</p>
-        <h3 class="font-serif text-xl font-semibold text-charcoal">
+        <h3 id="independence-heading" class="font-serif text-xl font-semibold text-charcoal">
           How We Stay Unbiased
         </h3>
         <ul class="space-y-2.5 text-sm text-charcoal">
@@ -190,6 +191,73 @@ const breadcrumbSchema: Record<string, unknown> = {
             teas.
           </p>
         </div>
+      </div>
+
+      <div class="border border-border-subtle rounded-md overflow-x-auto bg-rice">
+        <table class="w-full text-left border-collapse text-sm">
+          <caption class="visually-hidden">
+            Standardized studio instruments and calibration parameters used in TeapotsCool bench testing
+          </caption>
+          <thead class="bg-stone border-b border-border-subtle">
+            <tr>
+              <th scope="col" class="py-3 px-4 font-mono text-xs uppercase tracking-wider text-charcoal">
+                Bench Parameter
+              </th>
+              <th scope="col" class="py-3 px-4 font-mono text-xs uppercase tracking-wider text-charcoal">
+                Instrument &amp; Baseline Calibration
+              </th>
+              <th scope="col" class="py-3 px-4 font-mono text-xs uppercase tracking-wider text-charcoal">
+                Measured Output
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border-subtle">
+            <tr>
+              <th scope="row" class="py-3 px-4 font-semibold text-charcoal whitespace-nowrap">
+                Water Chemistry
+              </th>
+              <td class="py-3 px-4 text-muted">
+                Filtered water calibrated via digital TDS meter to 65 ppm (±5 ppm)
+              </td>
+              <td class="py-3 px-4 font-mono text-xs text-charcoal">
+                Uniform catechin/theanine extraction baseline
+              </td>
+            </tr>
+            <tr>
+              <th scope="row" class="py-3 px-4 font-semibold text-charcoal whitespace-nowrap">
+                Thermometry
+              </th>
+              <td class="py-3 px-4 text-muted">
+                Calibrated K-type digital immersion probe (±0.2°C) from 95°C start at 21°C ambient
+              </td>
+              <td class="py-3 px-4 font-mono text-xs text-charcoal">
+                °C logged at 3, 10, 20, and 30 minutes
+              </td>
+            </tr>
+            <tr>
+              <th scope="row" class="py-3 px-4 font-semibold text-charcoal whitespace-nowrap">
+                Mass &amp; Capacity
+              </th>
+              <td class="py-3 px-4 text-muted">
+                0.01g brew scale and Class-A graduated cylinder filled to collar line
+              </td>
+              <td class="py-3 px-4 font-mono text-xs text-charcoal">
+                Usable brewing ml vs. advertised rim volume
+              </td>
+            </tr>
+            <tr>
+              <th scope="row" class="py-3 px-4 font-semibold text-charcoal whitespace-nowrap">
+                Spout Cut-Off Test
+              </th>
+              <td class="py-3 px-4 text-muted">
+                Three pour tilt speeds with clean water and 2.5g/100ml fukamushi steamed sencha
+              </td>
+              <td class="py-3 px-4 font-mono text-xs text-charcoal">
+                Drain duration (sec), strainer clog rate, and droplet count
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </section>
 
