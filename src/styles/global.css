@@ -402,7 +402,7 @@
     padding-inline-end: 0.5rem;
     padding-bottom: 1.25rem;
     color: var(--text-muted);
-    max-width: 68ch;
+    max-width: 100%;
   }
 
   /* Mobile Nav Disclosure */
@@ -479,6 +479,13 @@
     border-top: 2px solid var(--text-primary);
     border-bottom: 1px solid var(--border-strong);
     margin-block: 2.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .prose-tea table {
+      display: table;
+      width: 100%;
+    }
   }
 
   .prose-tea th {

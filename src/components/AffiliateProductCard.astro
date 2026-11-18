@@ -110,8 +110,8 @@ const priceDisplay = market ? `${market.priceRange} (${resolvedPriceTier ?? '$'}
         </div>
       </div>
 
-      <div class="grid gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
-        <div class="space-y-4">
+      <div class="space-y-4">
+        <div class="grid gap-5 md:grid-cols-[minmax(0,1fr)_220px] md:items-center">
           <div class="flex flex-col sm:flex-row sm:items-start gap-4">
             {resolvedImage && (
               <img
@@ -122,7 +122,7 @@ const priceDisplay = market ? `${market.priceRange} (${resolvedPriceTier ?? '$'}
                 class="w-36 aspect-[4/3] sm:w-40 object-cover rounded border border-border-subtle shrink-0"
               />
             )}
-            <div class="space-y-1.5">
+            <div class="space-y-1.5 min-w-0">
               <h2 class="font-serif text-xl sm:text-2xl font-semibold text-charcoal leading-snug">
                 {name}
               </h2>
@@ -137,69 +137,73 @@ const priceDisplay = market ? `${market.priceRange} (${resolvedPriceTier ?? '$'}
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-6 py-3 border-y border-border-subtle">
-            <div>
-              <div class="flex items-baseline justify-between gap-2 mb-1.5">
-                <span class="font-mono text-[11px] uppercase tracking-wider text-muted">
-                  Pour Precision
-                </span>
-                <span class="font-serif text-lg font-semibold text-charcoal tabular-nums">
-                  {pourLabel}<span class="font-mono text-xs text-muted">/10</span>
-                </span>
-              </div>
-              <div class="score-bar" style={`--score: ${clampedPour}`} aria-hidden="true" />
-            </div>
-            <div>
-              <div class="flex items-baseline justify-between gap-2 mb-1.5">
-                <span class="font-mono text-[11px] uppercase tracking-wider text-muted">
-                  Heat Retention
-                </span>
-                <span class="font-serif text-lg font-semibold text-charcoal tabular-nums">
-                  {heatLabel}<span class="font-mono text-xs text-muted">/10</span>
-                </span>
-              </div>
-              <div
-                class="score-bar"
-                style={`--score: ${clampedHeat}; --score-color: var(--accent-terracotta-text);`}
-                aria-hidden="true"
-              />
-            </div>
+          <div class="flex flex-col gap-2 md:w-[220px] md:border-l md:border-border-subtle md:pl-5">
+            <a href={galleryHref ?? '/gallery/'} class="btn-matcha w-full text-center text-sm">
+              Read Studio Review &rarr;
+            </a>
+            <a href="#tested-picks-heading" class="btn-hairline w-full text-center text-sm">
+              Compare All Tested Picks &darr;
+            </a>
+            <p class="text-[11px] leading-snug text-muted">
+              Bench-verified for spout cut-off precision and 30-minute thermal stability.
+            </p>
           </div>
+        </div>
 
-          {pros.length > 0 && (
-            <ul class="space-y-1.5 text-sm text-charcoal">
-              {pros.slice(0, 3).map((pro) => (
-                <li class="flex items-start gap-2">
-                  <span class="font-mono font-bold text-matcha shrink-0" aria-hidden="true">
-                    +
-                  </span>
-                  <span>{pro}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {market && (
-            <div class="border-l-2 border-l-matcha bg-rice/85 px-3.5 py-2.5 text-xs space-y-1">
-              <p class="font-mono uppercase tracking-wider text-[10px] font-semibold text-terracotta-text">
-                What Online Buyers Say · {market.whereToBuy}
-              </p>
-              <p class="text-muted leading-relaxed">{market.buyerConsensus}</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 py-3.5 border-y border-border-subtle">
+          <div>
+            <div class="flex items-baseline justify-between gap-2 mb-1.5">
+              <span class="font-mono text-[11px] uppercase tracking-wider text-muted">
+                Pour Precision
+              </span>
+              <span class="font-serif text-lg font-semibold text-charcoal tabular-nums">
+                {pourLabel}<span class="font-mono text-xs text-muted">/10</span>
+              </span>
             </div>
-          )}
+            <div class="score-bar" style={`--score: ${clampedPour}`} aria-hidden="true" />
+          </div>
+          <div>
+            <div class="flex items-baseline justify-between gap-2 mb-1.5">
+              <span class="font-mono text-[11px] uppercase tracking-wider text-muted">
+                Heat Retention
+              </span>
+              <span class="font-serif text-lg font-semibold text-charcoal tabular-nums">
+                {heatLabel}<span class="font-mono text-xs text-muted">/10</span>
+              </span>
+            </div>
+            <div
+              class="score-bar"
+              style={`--score: ${clampedHeat}; --score-color: var(--accent-terracotta-text);`}
+              aria-hidden="true"
+            />
+          </div>
         </div>
 
-        <div class="flex flex-col gap-2.5 md:w-60 md:border-l md:border-border-subtle md:pl-6">
-          <a href={galleryHref ?? '/gallery/'} class="btn-matcha w-full text-center">
-            Read Studio Review &rarr;
-          </a>
-          <a href="#tested-picks-heading" class="btn-hairline w-full text-center">
-            Compare All Tested Picks &darr;
-          </a>
-          <p class="text-[11px] leading-snug text-muted">
-            Bench-verified for spout cut-off precision and 30-minute thermal stability.
-          </p>
-        </div>
+        {(pros.length > 0 || market) && (
+          <div class:list={['grid grid-cols-1 gap-5 items-stretch', pros.length > 0 && market ? 'md:grid-cols-12' : '']}>
+            {pros.length > 0 && (
+              <ul class:list={['space-y-1.5 text-sm text-charcoal flex flex-col justify-center', market ? 'md:col-span-7' : '']}>
+                {pros.slice(0, 3).map((pro) => (
+                  <li class="flex items-start gap-2">
+                    <span class="font-mono font-bold text-matcha shrink-0" aria-hidden="true">
+                      +
+                    </span>
+                    <span>{pro}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {market && (
+              <div class:list={['border-l-2 border-l-matcha bg-rice/85 px-4 py-3 text-xs flex flex-col justify-center space-y-1', pros.length > 0 ? 'md:col-span-5' : '']}>
+                <p class="font-mono uppercase tracking-wider text-[10px] font-semibold text-terracotta-text">
+                  What Online Buyers Say · {market.whereToBuy}
+                </p>
+                <p class="text-muted leading-relaxed">{market.buyerConsensus}</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </section>
   ) : variant === 'compact' ? (

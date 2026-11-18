@@ -224,11 +224,11 @@ const breadcrumbSchema: Record<string, unknown> = {
         </div>
       </div>
 
-      <div class="hairline-grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 rounded-md overflow-hidden">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {allTeapots.map((teapot) => {
           const market = getTeapotMarketData(getTeapotLeafSlug(teapot));
           return (
-            <article class="min-w-0 p-4 flex flex-col justify-between gap-3 hover:bg-stone/35 transition-colors">
+            <article class="min-w-0 p-4 border border-border-subtle bg-rice rounded-md flex flex-col justify-between gap-3 hover:bg-stone/35 transition-colors">
               <div class="space-y-1.5">
                 <p class="font-mono text-[10px] uppercase tracking-wider text-terracotta-text font-semibold">
                   {teapot.data.material}
