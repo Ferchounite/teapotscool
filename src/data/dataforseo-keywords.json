@@ -12,10 +12,10 @@
       "keyword_difficulty": 0
     },
     {
-      "keyword": "glass teapot",
-      "search_volume": 9900,
-      "cpc": 0.74,
-      "keyword_difficulty": 0
+      "keyword": "tea pet",
+      "search_volume": 12100,
+      "cpc": 0.55,
+      "keyword_difficulty": 6
     },
     {
       "keyword": "ceramic teapot",
@@ -24,9 +24,9 @@
       "keyword_difficulty": 0
     },
     {
-      "keyword": "yixing clay teapot",
-      "search_volume": 8100,
-      "cpc": 1.09,
+      "keyword": "glass teapot",
+      "search_volume": 9900,
+      "cpc": 0.74,
       "keyword_difficulty": 0
     },
     {
@@ -36,10 +36,34 @@
       "keyword_difficulty": 7
     },
     {
+      "keyword": "yixing clay teapot",
+      "search_volume": 8100,
+      "cpc": 1.09,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "japanese tea set",
+      "search_volume": 5400,
+      "cpc": 1.23,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "chinese tea set",
+      "search_volume": 4400,
+      "cpc": 0.89,
+      "keyword_difficulty": 12
+    },
+    {
       "keyword": "japanese teapot",
       "search_volume": 4400,
       "cpc": 1.62,
       "keyword_difficulty": 0
+    },
+    {
+      "keyword": "porcelain tea set",
+      "search_volume": 4400,
+      "cpc": 0.78,
+      "keyword_difficulty": 5
     },
     {
       "keyword": "borosilicate glass teapot",
@@ -51,6 +75,12 @@
       "keyword": "cast iron teapot",
       "search_volume": 3600,
       "cpc": 0.64,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "gongfu tea set",
+      "search_volume": 3600,
+      "cpc": 1.09,
       "keyword_difficulty": 0
     },
     {
@@ -78,6 +108,48 @@
       "keyword_difficulty": 0
     },
     {
+      "keyword": "teapot warmer",
+      "search_volume": 1900,
+      "cpc": 0.62,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "teapot with warmer",
+      "search_volume": 1900,
+      "cpc": 0.62,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "travel tea set",
+      "search_volume": 1900,
+      "cpc": 1.08,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "gaiwan tea set",
+      "search_volume": 1600,
+      "cpc": 1.34,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "portable tea set",
+      "search_volume": 1600,
+      "cpc": 0.91,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "ceramic tea set",
+      "search_volume": 1300,
+      "cpc": 0.86,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "gongfu tea tray",
+      "search_volume": 1300,
+      "cpc": 1.31,
+      "keyword_difficulty": 0
+    },
+    {
       "keyword": "unique teapots",
       "search_volume": 1000,
       "cpc": 0.52,
@@ -87,6 +159,18 @@
       "keyword": "tea steeping timer",
       "search_volume": 880,
       "cpc": 0.41,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "bamboo tea tray",
+      "search_volume": 720,
+      "cpc": 0.98,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "magnetic teapot",
+      "search_volume": 720,
+      "cpc": 0.48,
       "keyword_difficulty": 0
     },
     {
@@ -114,9 +198,33 @@
       "keyword_difficulty": 1
     },
     {
+      "keyword": "tea ceremony set",
+      "search_volume": 390,
+      "cpc": 1.51,
+      "keyword_difficulty": 4
+    },
+    {
+      "keyword": "tenmoku tea cups",
+      "search_volume": 390,
+      "cpc": 1.3,
+      "keyword_difficulty": 0
+    },
+    {
       "keyword": "tetsubin teapot",
       "search_volume": 390,
       "cpc": 0.51,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "kung fu tea set",
+      "search_volume": 260,
+      "cpc": 1.22,
+      "keyword_difficulty": 7
+    },
+    {
+      "keyword": "descale teapot",
+      "search_volume": 210,
+      "cpc": 0.25,
       "keyword_difficulty": 0
     },
     {
@@ -126,9 +234,9 @@
       "keyword_difficulty": 0
     },
     {
-      "keyword": "descale teapot",
-      "search_volume": 210,
-      "cpc": 0.25,
+      "keyword": "ceramic teapot warmer",
+      "search_volume": 170,
+      "cpc": 0.28,
       "keyword_difficulty": 0
     },
     {
@@ -148,6 +256,18 @@
       "search_volume": 90,
       "cpc": 0.92,
       "keyword_difficulty": 0
+    },
+    {
+      "keyword": "rotating teapot",
+      "search_volume": 70,
+      "cpc": 0.98,
+      "keyword_difficulty": 0
+    },
+    {
+      "keyword": "semi automatic teapot",
+      "search_volume": 70,
+      "cpc": 0.36,
+      "keyword_difficulty": 1
     }
   ]
 }
