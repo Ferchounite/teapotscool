@@ -142,6 +142,21 @@ export const TEAPOT_MARKET_DATA: Readonly<Record<string, TeapotMarketData>> = {
     buyerPraise: 'Concentrates oolong & pu-erh fragrance while pouring with balanced water-level poise.',
     buyerCaveat: 'Dedicate each pot to one tea type (porous clay absorbs oils); verify trusted kiln sourcing.',
   },
+  'forlife-stump-extra-fine-infuser-teapot': {
+    slug: 'forlife-stump-extra-fine-infuser-teapot',
+    priceRange: '$40–$50 USD',
+    lowPrice: 40,
+    highPrice: 50,
+    buyerRating: 4.7,
+    buyerReviewCount: 3400,
+    whereToBuy: 'FORLIFE Design USA, Harney & Sons, The Steeping Room & Major Retailers',
+    buyerConsensus:
+      'Rated ~4.6–4.8★ across specialty tea shops and homeware retailers for stackable cafe durability, ultra-fine 0.3-mm stainless steel infuser clarity, and clean spout control.',
+    buyerPraise:
+      'Drinkers praise how cleanly the permanently attached hinged stainless steel lid flips up for refilling, how the 0.3-mm micro-mesh infuser traps fine rooibos and broken black tea dust, and how stacks of pots save counter space.',
+    buyerCaveat:
+      'The permanently attached metal lid precludes microwaving, and boiling 100°C fills require mindful handle alignment when lifting right away.',
+  },
 };
 
 export function getTeapotMarketData(slug: string | undefined): TeapotMarketData | undefined {
