@@ -169,6 +169,22 @@ export const TEAPOT_MARKET_DATA: Readonly<Record<string, TeapotMarketData>> = {
     buyerCaveat:
       'The permanently attached metal lid precludes microwaving, and boiling 100°C fills require mindful handle alignment when lifting right away.',
   },
+  'tangpin-ceramic-portable-gongfu-travel-tea-set': {
+    slug: 'tangpin-ceramic-portable-gongfu-travel-tea-set',
+    priceRange: '$32–$55 USD',
+    lowPrice: 32,
+    highPrice: 55,
+    offerCount: 4,
+    buyerRating: 4.7,
+    buyerReviewCount: 1650,
+    whereToBuy: 'Tangpin Tea Official, Etsy, Walmart & Specialty Asian Teaware Shops',
+    buyerConsensus:
+      'Rated ~4.6–4.8★ across Etsy, specialty teaware shops, and direct storefronts for shock-resistant EVA travel cases, nesting compact footprint, and clean glazed porcelain/stoneware taste.',
+    buyerPraise:
+      'Travelers praise how the pot, three tasting cups, fairness pitcher, and folding tray nest tightly inside the padded zipper case for hotels, camping, and office desks without chipping.',
+    buyerCaveat:
+      'Included Gongfu tasting cups hold modest 35–45 ml sips, and mass-produced filter holes handle rolled oolong cleanly but let fine green tea dust pass.',
+  },
 };
 
 export function getTeapotMarketData(slug: string | undefined): TeapotMarketData | undefined {
