@@ -3,6 +3,7 @@ export interface TeapotMarketData {
   priceRange: string;
   lowPrice: number;
   highPrice: number;
+  offerCount: number;
   buyerRating: number;
   buyerReviewCount: number;
   whereToBuy: string;
@@ -17,6 +18,7 @@ export const TEAPOT_MARKET_DATA: Readonly<Record<string, TeapotMarketData>> = {
     priceRange: '$20–$30 USD',
     lowPrice: 20,
     highPrice: 30,
+    offerCount: 4,
     buyerRating: 4.7,
     buyerReviewCount: 4850,
     whereToBuy: 'Hario USA, Specialty Tea Shops & Major Retailers',
@@ -30,6 +32,7 @@ export const TEAPOT_MARKET_DATA: Readonly<Record<string, TeapotMarketData>> = {
     priceRange: '$95–$145 USD',
     lowPrice: 95,
     highPrice: 145,
+    offerCount: 4,
     buyerRating: 4.5,
     buyerReviewCount: 1420,
     whereToBuy: 'Bredemeijer Official, European Kitchenware Stockists & Specialty Shops',
@@ -43,6 +46,7 @@ export const TEAPOT_MARKET_DATA: Readonly<Record<string, TeapotMarketData>> = {
     priceRange: '$115–$145 USD',
     lowPrice: 115,
     highPrice: 145,
+    offerCount: 5,
     buyerRating: 4.6,
     buyerReviewCount: 1180,
     whereToBuy: 'Global Kitchen Japan, Miya Company, Oryoki & Specialty Retailers',
@@ -56,6 +60,7 @@ export const TEAPOT_MARKET_DATA: Readonly<Record<string, TeapotMarketData>> = {
     priceRange: '$28–$40 USD',
     lowPrice: 28,
     highPrice: 40,
+    offerCount: 5,
     buyerRating: 4.8,
     buyerReviewCount: 3600,
     whereToBuy: 'Teabloom Official Store, Walmart, Target & Online Tea Boutiques',
@@ -69,6 +74,7 @@ export const TEAPOT_MARKET_DATA: Readonly<Record<string, TeapotMarketData>> = {
     priceRange: '$45–$65 USD',
     lowPrice: 45,
     highPrice: 65,
+    offerCount: 4,
     buyerRating: 4.8,
     buyerReviewCount: 2900,
     whereToBuy: 'Zero Japan USA, PekoeTea & Independent Ceramic Stockists',
@@ -82,6 +88,7 @@ export const TEAPOT_MARKET_DATA: Readonly<Record<string, TeapotMarketData>> = {
     priceRange: '$25–$35 USD',
     lowPrice: 25,
     highPrice: 35,
+    offerCount: 3,
     buyerRating: 4.6,
     buyerReviewCount: 6200,
     whereToBuy: 'Sweese Official Store & Major Home Kitchen Marketplaces',
@@ -95,6 +102,7 @@ export const TEAPOT_MARKET_DATA: Readonly<Record<string, TeapotMarketData>> = {
     priceRange: '$110–$175 USD',
     lowPrice: 110,
     highPrice: 175,
+    offerCount: 4,
     buyerRating: 4.9,
     buyerReviewCount: 640,
     whereToBuy: 'Sazen Tea, Tezumi, Camellia Sinensis & Oryoki',
@@ -108,6 +116,7 @@ export const TEAPOT_MARKET_DATA: Readonly<Record<string, TeapotMarketData>> = {
     priceRange: '$35–$58 USD',
     lowPrice: 35,
     highPrice: 58,
+    offerCount: 5,
     buyerRating: 4.5,
     buyerReviewCount: 2150,
     whereToBuy: 'Walmart, Home Depot, Wayfair & Specialty Tea Shops',
@@ -121,6 +130,7 @@ export const TEAPOT_MARKET_DATA: Readonly<Record<string, TeapotMarketData>> = {
     priceRange: '$22–$45 USD',
     lowPrice: 22,
     highPrice: 45,
+    offerCount: 3,
     buyerRating: 4.6,
     buyerReviewCount: 1750,
     whereToBuy: 'Yunnan Sourcing & Specialty Gongfu Tea Ware Stores',
@@ -134,6 +144,7 @@ export const TEAPOT_MARKET_DATA: Readonly<Record<string, TeapotMarketData>> = {
     priceRange: '$120–$220 USD',
     lowPrice: 120,
     highPrice: 220,
+    offerCount: 4,
     buyerRating: 4.8,
     buyerReviewCount: 520,
     whereToBuy: 'Mud & Leaves, Teavivre, Seven Cups & Yunnan Sourcing',
@@ -147,6 +158,7 @@ export const TEAPOT_MARKET_DATA: Readonly<Record<string, TeapotMarketData>> = {
     priceRange: '$40–$50 USD',
     lowPrice: 40,
     highPrice: 50,
+    offerCount: 5,
     buyerRating: 4.7,
     buyerReviewCount: 3400,
     whereToBuy: 'FORLIFE Design USA, Harney & Sons, The Steeping Room & Major Retailers',

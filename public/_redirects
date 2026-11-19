@@ -1,3 +1,5 @@
 https://www.teapotscool.com/* https://teapotscool.com/:splat 301!
 /affiliate-disclosure /about/ 301
 /affiliate-disclosure/ /about/ 301
+/feed /guides/ 301
+/feed/ /guides/ 301

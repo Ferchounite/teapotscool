@@ -282,6 +282,10 @@ if (affiliateProducts && affiliateProducts.length > 0) {
         item: {
           '@type': 'Product',
           name: product.name,
+          description:
+            product.bestFor ??
+            `${product.badge} ${product.material} teapot (${product.capacity}) evaluated for pour precision and thermal retention.`,
+          image: mkt ? [`${SITE_URL}/images/teapots/${mkt.slug}.png?v=2`] : [imageUrl],
           material: product.material,
           url: product.teapotSlug
             ? `${SITE_URL}/gallery/${product.teapotSlug}/`
@@ -300,6 +304,7 @@ if (affiliateProducts && affiliateProducts.length > 0) {
                   priceCurrency: 'USD',
                   lowPrice: mkt.lowPrice,
                   highPrice: mkt.highPrice,
+                  offerCount: mkt.offerCount,
                   availability: 'https://schema.org/InStock',
                 },
               }
